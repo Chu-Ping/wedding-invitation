@@ -136,7 +136,7 @@ This is the working direction for the current prototype, not a final wedding the
 - Accessibility or readability requirements:
 - Browser requirements beyond desktop browser access:
 - Privacy or access expectations for the invitation link:
-- Hosting or domain preference:
+- Hosting or domain preference: GitHub Pages, publishing `main` from the repository root. Custom domain remains undecided.
 - Open-source dependencies or licenses to prefer or avoid:
 
 ## Assets

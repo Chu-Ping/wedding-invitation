@@ -627,8 +627,22 @@ comparison, and return to the room passed without failed assets or uncaught erro
 
 ### Build or publish
 
-No build step is needed. Publish the project as static files on a host that
-serves JavaScript modules and GLB assets. Hosting and domain remain TODO.
+No build step is needed. `index.html` is already at the repository root and
+tracked by Git. Asset paths are relative, supporting GitHub Pages project URLs.
+The root `.nojekyll` file tells Pages to serve the static files without Jekyll.
+
+To publish using GitHub Pages:
+
+1. Commit and push the project, including `.nojekyll`, to `main`.
+2. Open the repository on GitHub and go to **Settings > Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**.
+4. Select **main** and **/(root)**, then **Save**.
+5. Once deployment completes, use the **Visit site** link shown on that page.
+
+Keep `resource/` and `vendor/` beside `index.html`, including all seven optimized
+GLBs, image `web/` folders, text files, and the MP3. Ignored originals are not
+needed for the published invitation. A custom domain is optional and undecided.
+See [GitHub's publishing-source instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 Record the supplied model's license and any required attribution before publishing;
 see `THIRD_PARTY_NOTICES.md`.
 
