@@ -6,7 +6,7 @@ A browser-based wedding invitation designed as a small interactive experience. G
 
 ## Project status
 
-**09 / Photo shelves** opens `resource/model/shelf.glb` with the shared zoom,
+**09 / Photo shelves** opens `resource/model/shelf.optimized.glb` with the shared zoom,
 3D controls, exposure, and real room photo comparison. `shelf.jpg` is retained
 as a reference photo.
 
@@ -125,8 +125,8 @@ glows are limited to the leftmost beer can in Cabinet left and the left photo
 frame in Cabinet right; other objects remain scenery.
 
 **02 / Grinder** opens
-`resource/model/grinder/Meshy_AI_Morning_Grind_Setup_1018174904_texture.glb`
-(about 16.5 MB, 385,184 triangles). It uses the existing grinder location in the
+`resource/model/grinder/grinder.optimized.glb`
+(about 1.61 MB, 179,998 triangles). It uses the existing grinder location in the
 room, shared zoom, left framing, exposure, drag/scroll and keyboard interaction,
 and real-photo comparison. The original model and reference photos are unchanged.
 Collecting the bean reveals Grinder; successfully opening it reveals Espresso
@@ -139,7 +139,7 @@ activation. Text is re-read whenever the popup opens, preserving paragraphs.
 Close/Escape returns to the model and restores focus. `grinder-interactions.js`
 holds the button calibration; the original GLB is unchanged.
 
-**01 / Pegboard** opens `resource/model/pegboard.glb` using the same zoom,
+**01 / Pegboard** opens `resource/model/pegboard.optimized.glb` using the same zoom,
 blurred room background, drag/scroll and keyboard interaction, and exposure as the other
 models. The original `resource/images/main_scene/pegboard.jpg` stays as a reference.
 
@@ -285,9 +285,9 @@ resource/
       0.jpg ... 12.jpg         Original cat sequence, in numeric order
       web/0.jpg ... 12.jpg     Optimized playback copies, 1200 × 900
   model/
-    espresso.glb               Interactive espresso model, including textures
-    pegboard.glb               Interactive pegboard model, including textures
-    shelf.glb                  Interactive wall-shelves model, marker 09
+    espresso.optimized.glb     Current compressed espresso model
+    pegboard.optimized.glb     Current compressed pegboard model
+    shelf.optimized.glb        Current compressed photo-shelves model, marker 09
     display_shelf/
       left/*.glb              Left shelf grouping
       right/*.glb             Right shelf grouping
@@ -302,6 +302,13 @@ format. Individual scene photos are in `resource/images/main_scene/`.
 `scene-elements.js` maps the object photos and their room locations; `app.js`
 loads the selected GLB. See **Room asset mapping** below for all current markers.
 Use relative asset URLs in code rather than machine-specific Windows paths.
+
+`.gitignore` keeps local source/reference images out of Git: original numbered
+photos, original door/cat frames, model reference JPGs, and individual room
+reference photos. The 98 browser image assets remain included: gallery and
+animation `web/` copies, both room backdrops, reward images, and the card.
+The 116 ignored images stay on disk; originals are still needed to rebuild
+optimized copies and are not distributed by a fresh Git checkout.
 
 ## Instructions for an AI coding agent
 
@@ -353,9 +360,9 @@ advances after mouse and keyboard activation, loops at the end, and continues
 through model views and reward popups. Manual pause persists across navigation;
 the player fits a 390-pixel viewport without horizontal overflow.
 
-Models load on demand: espresso is about 31 MB, the left display about 28 MB,
-the right display about 2.7 MB, pegboard about 34 MB, cabinet top about 4.1 MB,
-and photo shelves about 26 MB.
+Models load on demand: espresso is about 2.44 MB, pegboard 2.64 MB, photo
+shelves 2.46 MB, grinder 1.61 MB, cabinet left 2.44 MB, cabinet top 4.06 MB,
+and cabinet right 2.69 MB (decimal sizes).
 A single renderer serves all seven, and loaded
 models are cached for repeat visits. A loading message,
 retry action, and return button remain available during loading or failure.
@@ -365,38 +372,50 @@ transparent; only the photo background is blurred. Returning restores the clear
 cartoon room. The room is a flat image, and the model is not registered seamlessly
 into that image.
 
-### Optimized cabinet models
+### Optimized models
 
-Cabinet top and Cabinet right use optimized copies; their original `Meshy_*.glb`
-files remain unchanged in the same folders. Other models are unchanged.
+All seven model views load optimized GLBs. Every original is kept locally and
+ignored by Git; the optimized files must be included when publishing.
 
-| Model | Original / optimized size (decimal MB) | Original / optimized triangles |
+| Model | Original / optimized MB | Original / optimized triangles |
 | --- | --- | --- |
 | Cabinet top | 138.66 / 4.06 | 4,323,986 / 399,996 |
 | Cabinet right | 57.14 / 2.69 | 1,649,310 / 249,994 |
+| Espresso machine | 32.35 / 2.44 | 849,822 / 249,988 |
+| Pegboard | 36.09 / 2.64 | 989,038 / 299,978 |
+| Photo shelves | 27.44 / 2.46 | 712,676 / 300,000 |
+| Grinder | 16.54 / 1.61 | 385,184 / 179,998 |
+| Cabinet left | 29.46 / 2.44 | 730,336 / 249,996 |
 
-Both use three 1024 x 1024 JPEG textures (quality 85, full chroma resolution),
-compared with 2048 x 2048 originals. Meshopt compresses the geometry after
-simplification and quantization. Smaller text and fine surface details are softer,
-especially when zoomed close. Colors, materials, framing, and interaction remain
-consistent. File-size savings are about 97% and 95%, respectively.
-`resource/model/display_shelf/optimization-report.json` records exact asset statistics.
-The decoder is bundled locally under `vendor/meshoptimizer/`; no CDN is used.
+Each model uses three 1024-pixel JPEG textures (quality 85, full chroma), geometry
+simplification, quantization, and Meshopt compression. Fine texture details are
+softer. Model coordinates, framing, and interaction regions are preserved; no
+new dependency was added. The five newly optimized models total 11.60 MB instead
+of 141.88 MB (about 92% smaller). The decoder is local in `vendor/meshoptimizer/`.
+Reports: `resource/model/optimization-report.json` (five new copies) and
+`resource/model/display_shelf/optimization-report.json` (Cabinet top/right).
 
-Rebuild these copies only when needed, using Node.js 22+ and Python with Pillow:
+To rebuild from the locally retained originals, use Node.js 22+ and Python/Pillow:
 
 ```powershell
 npm install --prefix .local-preview/model-tools --no-audit --no-fund @gltf-transform/core@4.5.0 @gltf-transform/functions@4.5.0 @gltf-transform/extensions@4.5.0 meshoptimizer@1.0.1
 python -m pip install Pillow
 node --max-old-space-size=6144 scripts/optimize-cabinet-models.mjs
+node --max-old-space-size=6144 scripts/optimize-scene-models.mjs
 ```
 
-The script preserves originals, writes the two `*.optimized.glb` files and report,
-and verifies each compressed result by decoding it again. The helper
-`scripts/resize-model-texture.py` uses Pillow for textures. Optimization happens
-locally. Node and these preparation packages are unnecessary for normal preview.
-To restore original quality, point the corresponding entries in `scene-elements.js`
-back to the original `Meshy_*.glb` files.
+The cabinet script exports the shared optimization pipeline; running it directly
+rebuilds Cabinet top/right. The scene script rebuilds the other five. Both use
+`scripts/resize-model-texture.py`, preserve originals, and decode each output to
+verify its triangle count. Node and preparation packages are not needed to preview.
+A fresh Git checkout contains the optimized assets; rebuilding requires the
+locally retained originals.
+
+Checked in Chrome with the compressed models: coffee bag and grounds rewards,
+espresso center button, all 17 shelf surface clicks and exact grouped albums,
+vase/can/frame photo links, keyboard/focus behavior, progression, narrow-screen
+picking, real room comparison, cached re-entry, and all model views. Original
+source hashes were unchanged; all seven optimized GLBs remain included by Git.
 
 ### Project files
 
@@ -409,12 +428,12 @@ back to the original `Meshy_*.glb` files.
 - `frame-animation.js`: shared elapsed-time playback: door at 6 fps, cat at 2 fps with hover pause.
 - `resource/images/main_scene/whole_scene_cartoon.png`: default 4:3 cartoon backdrop.
 - `resource/images/main_scene/whole_scene.jpg`: original real room image for comparison.
-- `resource/model/espresso.glb`: original espresso model.
-- `resource/model/pegboard.glb`: supplied pegboard model.
+- `resource/model/espresso.optimized.glb`: current optimized espresso model.
+- `resource/model/pegboard.optimized.glb`: current optimized pegboard model.
 - `resource/model/display_shelf/left/` and `right/`: supplied shelf models and reference photos.
 - `vendor/three/`: pinned Three.js 0.180.0 modules, licensed under MIT.
 - `vendor/meshoptimizer/`: local Meshoptimizer 1.0.1 decoder, licensed under MIT.
-- `scripts/optimize-cabinet-models.mjs`, `scripts/resize-model-texture.py`: optional local model preparation.
+- `scripts/optimize-cabinet-models.mjs`, `scripts/optimize-scene-models.mjs`, `scripts/resize-model-texture.py`: optional local model preparation.
 - [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md): dependency sources and asset notes.
 
 The hotspot coordinates are in `scene-elements.js`; photo zooms use these same
@@ -426,15 +445,15 @@ window resizes. The model is centered and framed automatically from its bounds.
 
 | Marker | Area | Detail asset(s) |
 | --- | --- | --- |
-| 01 | Pegboard | `resource/model/pegboard.glb`; `pegboard.jpg` remains a reference photo |
-| 02 | Grinder | `resource/model/grinder/Meshy_AI_Morning_Grind_Setup_1018174904_texture.glb` |
-| 03 | Espresso machine | `resource/model/espresso.glb`; `espresso.jpg` remains a reference photo |
+| 01 | Pegboard | `resource/model/pegboard.optimized.glb`; `pegboard.jpg` remains a reference photo |
+| 02 | Grinder | `resource/model/grinder/grinder.optimized.glb` |
+| 03 | Espresso machine | `resource/model/espresso.optimized.glb`; `espresso.jpg` remains a reference photo |
 | 04 | Cabinet top | `resource/model/display_shelf/top/cabinet-top.optimized.glb`; `side_cabinet_top.jpg` remains a reference |
-| 05 | Cabinet left | `resource/model/display_shelf/left/Meshy_AI_Brews_and_Spicy_Noodl_1018125201_texture.glb` |
+| 05 | Cabinet left | `resource/model/display_shelf/left/cabinet-left.optimized.glb` |
 | 06 | Cabinet right | `resource/model/display_shelf/right/cabinet-right.optimized.glb` |
 | 07 | Cabinet doors | 11 frames from `resource/images/opening_door/web/`, ordered by original timestamp, at 6 fps |
 | 08 | Beneath the cabinet | `resource/images/cat/web/0.jpg` through `12.jpg`, in numeric order, at 2 fps; hover to pause |
-| 09 | Photo shelves | `resource/model/shelf.glb`; `shelf.jpg` remains a reference photo |
+| 09 | Photo shelves | `resource/model/shelf.optimized.glb`; `shelf.jpg` remains a reference photo |
 
 The named list and this mapping use the current order, numbered 01-09.
 The cat animation uses the beneath-cabinet area. Earlier cabinet
@@ -613,5 +632,6 @@ serves JavaScript modules and GLB assets. Hosting and domain remain TODO.
 Record the supplied model's license and any required attribution before publishing;
 see `THIRD_PARTY_NOTICES.md`.
 
-#   w e d d i n g - i n v i t a t i o n  
+#   w e d d i n g - i n v i t a t i o n 
+ 
  

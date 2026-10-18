@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Cabinet top",
+    "source": "resource/model/display_shelf/top/Meshy_AI_Shelf_of_Memories_1018141613_texture.glb",
+    "output": "resource/model/display_shelf/top/cabinet-top.optimized.glb",
+    "sourceBytes": 138660304,
+    "outputBytes": 4057780,
+    "sourceTriangles": 4323986,
+    "outputTriangles": 399996,
+    "targetTriangles": 400000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  },
+  {
+    "name": "Cabinet right",
+    "source": "resource/model/display_shelf/right/Meshy_AI_Miniature_Memories_1018130130_texture.glb",
+    "output": "resource/model/display_shelf/right/cabinet-right.optimized.glb",
+    "sourceBytes": 57135608,
+    "outputBytes": 2692476,
+    "sourceTriangles": 1649310,
+    "outputTriangles": 249994,
+    "targetTriangles": 250000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  }
+]

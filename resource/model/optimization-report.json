@@ -1,0 +1,167 @@
+[
+  {
+    "name": "Espresso machine",
+    "source": "resource/model/espresso.glb",
+    "output": "resource/model/espresso.optimized.glb",
+    "sourceBytes": 32347748,
+    "outputBytes": 2443792,
+    "sourceTriangles": 849822,
+    "outputTriangles": 249988,
+    "targetTriangles": 250000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  },
+  {
+    "name": "Pegboard",
+    "source": "resource/model/pegboard.glb",
+    "output": "resource/model/pegboard.optimized.glb",
+    "sourceBytes": 36088848,
+    "outputBytes": 2635968,
+    "sourceTriangles": 989038,
+    "outputTriangles": 299978,
+    "targetTriangles": 300000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  },
+  {
+    "name": "Photo shelves",
+    "source": "resource/model/shelf.glb",
+    "output": "resource/model/shelf.optimized.glb",
+    "sourceBytes": 27442844,
+    "outputBytes": 2464212,
+    "sourceTriangles": 712676,
+    "outputTriangles": 300000,
+    "targetTriangles": 300000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  },
+  {
+    "name": "Grinder",
+    "source": "resource/model/grinder/Meshy_AI_Morning_Grind_Setup_1018174904_texture.glb",
+    "output": "resource/model/grinder/grinder.optimized.glb",
+    "sourceBytes": 16538640,
+    "outputBytes": 1612480,
+    "sourceTriangles": 385184,
+    "outputTriangles": 179998,
+    "targetTriangles": 180000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  },
+  {
+    "name": "Cabinet left",
+    "source": "resource/model/display_shelf/left/Meshy_AI_Brews_and_Spicy_Noodl_1018125201_texture.glb",
+    "output": "resource/model/display_shelf/left/cabinet-left.optimized.glb",
+    "sourceBytes": 29464720,
+    "outputBytes": 2444124,
+    "sourceTriangles": 730336,
+    "outputTriangles": 249996,
+    "targetTriangles": 250000,
+    "textures": [
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      },
+      {
+        "size": [
+          1024,
+          1024
+        ],
+        "mimeType": "image/jpeg"
+      }
+    ]
+  }
+]

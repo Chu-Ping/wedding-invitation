@@ -1,0 +1,22 @@
+.local-preview/
+__pycache__/
+
+# Local source models; the browser uses the optimized GLBs.
+/resource/model/espresso.glb
+/resource/model/pegboard.glb
+/resource/model/shelf.glb
+/resource/model/grinder/Meshy_AI_Morning_Grind_Setup_1018174904_texture.glb
+/resource/model/display_shelf/left/Meshy_AI_Brews_and_Spicy_Noodl_1018125201_texture.glb
+/resource/model/display_shelf/right/Meshy_AI_Miniature_Memories_1018130130_texture.glb
+/resource/model/display_shelf/top/Meshy_AI_Shelf_of_Memories_1018141613_texture.glb
+
+# Local image originals and references; keep browser-ready web/ copies.
+/resource/images/photos/*.[jJ][pP][gG]
+/resource/images/photos/*.[hH][eE][iI][cC]
+/resource/images/opening_door/*.[jJ][pP][gG]
+/resource/images/cat/*.[jJ][pP][gG]
+/resource/model/**/*.[jJ][pP][gG]
+
+# Individual room reference photos are unused; retain the real backdrop.
+/resource/images/main_scene/*.[jJ][pP][gG]
+!/resource/images/main_scene/whole_scene.jpg

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invitation：佑琦 &amp; 竹平</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "./vendor/three/build/three.module.js",
+      "three/addons/": "./vendor/three/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="app.js?v=20261018-optimized"></script>
+  <script type="module" src="background-music.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <div><span class="eyebrow">Invitation：佑琦 &amp; 竹平</span><h1>Explore our room</h1></div>
+    <p id="scene-hint" hidden></p>
+  </header>
+  <main>
+    <div class="scene-layout">
+      <div class="stage" id="stage" data-state="room" aria-label="Interactive room scene">
+        <div class="room" id="room">
+          <img id="backdrop" src="resource/images/main_scene/whole_scene_cartoon.png" width="1448" height="1086" alt="A block-style cartoon room with coffee equipment, wall shelves, a side cabinet and a large plant." data-style="cartoon" fetchpriority="high">
+          <div id="hotspots" aria-label="Objects in the room"></div>
+        </div>
+        <section class="photo-view" id="photo-view" aria-labelledby="photo-title" hidden>
+          <div class="photo-heading"><span class="eyebrow">A closer look</span><h2 id="photo-title" tabindex="-1"></h2></div>
+          <div class="photo-frame"><img id="detail-photo" alt="" hidden><canvas id="animation-canvas" role="img" aria-label="Animation" hidden></canvas></div>
+          <div id="animation-controls" class="animation-controls" aria-label="Animation playback controls" hidden>
+            <button id="animation-play" type="button">Play animation</button>
+            <button id="animation-replay" type="button">Replay</button>
+          </div>
+          <nav id="photo-variants" class="photo-variants" aria-label="Alternate views" hidden></nav>
+        </section>
+        <section class="model-view" id="model-view" aria-label="Object viewer" hidden>
+          <div class="viewer-heading"><span class="eyebrow">A closer look</span><h2 id="model-title"></h2></div>
+          <div id="model-canvas" class="model-canvas" tabindex="0" role="group" aria-label="Object. Drag to rotate or scroll to zoom."></div>
+          <div class="detail-switches">
+            <button id="detail-mode-button" type="button" aria-controls="model-canvas backdrop" aria-pressed="false">Show room image</button>
+          </div>
+        </section>
+        <button id="back-button" class="back-button" type="button" hidden>← Back to room</button>
+        <div class="status-panel" id="status-panel" hidden>
+          <p id="status" role="status" aria-live="polite"></p>
+          <button id="retry-button" type="button" hidden>Try again</button>
+        </div>
+      </div>
+      <aside id="model-copy" class="model-copy" aria-label="About this object" tabindex="0" hidden></aside>
+      <div id="animation-copy" class="animation-copy" hidden></div>
+    </div>
+    <section id="pegboard-objects" class="shelf-objects" aria-label="Pegboard object buttons" hidden>
+      <p id="pegboard-selection" role="status" aria-live="polite"></p>
+      <div class="object-list"><button id="coffee-bag-button" type="button" aria-pressed="false" aria-haspopup="dialog" aria-controls="item-reward">Coffee bag</button></div>
+    </section>
+    <section id="grinder-objects" class="shelf-objects" aria-label="Grinder button" hidden>
+      <p id="grinder-selection" role="status" aria-live="polite"></p>
+      <div class="object-list"><button id="grinder-button" type="button" aria-pressed="false" aria-haspopup="dialog" aria-controls="item-reward">Grinder button</button></div>
+    </section>
+    <section id="espresso-objects" class="shelf-objects" aria-label="Espresso machine button" hidden>
+      <p id="espresso-selection" role="status" aria-live="polite"></p>
+      <div class="object-list"><button id="espresso-center-button" type="button" aria-pressed="false" aria-haspopup="dialog" aria-controls="item-reward">Center button</button></div>
+    </section>
+    <section id="cabinet-objects" class="shelf-objects" aria-label="Cabinet object buttons" hidden>
+      <p id="cabinet-selection" role="status" aria-live="polite"></p>
+      <div id="cabinet-object-buttons" class="object-list"></div>
+    </section>
+    <section id="shelf-objects" class="shelf-objects" aria-label="Shelf object buttons" hidden>
+      <p id="shelf-selection" role="status" aria-live="polite"></p>
+      <div id="shelf-object-buttons" class="object-list"></div>
+    </section>
+    <nav id="object-list" class="object-list" aria-label="Explore room objects"></nav>
+    <section class="room-music" aria-label="Background music">
+      <audio id="background-music" controls loop preload="metadata" aria-label="Background music: Just the Two of Us by Joanna Wang">
+        <source src="resource/sound/Joanna_Wang_-_Just_The_Two_Of_Us_(mp3.pm).mp3" type="audio/mpeg">
+      </audio>
+      <p>Just the Two of Us · Joanna Wang</p>
+    </section>
+    <noscript><p>Enable JavaScript to explore the room objects.</p></noscript>
+  </main>
+  <dialog id="item-reward" class="shelf-gallery reward-dialog" aria-labelledby="item-reward-title" aria-describedby="item-reward-text">
+    <div class="shelf-gallery-heading">
+      <h2 id="item-reward-title"></h2>
+      <button type="button" data-reward-close aria-label="Close item and return to the model">Close ×</button>
+    </div>
+    <div class="reward-content">
+      <img alt="" hidden>
+      <p id="item-reward-text" data-reward-text hidden></p>
+    </div>
+    <p data-reward-status role="status" aria-live="polite"></p>
+    <button type="button" data-reward-retry hidden>Try again</button>
+  </dialog>
+  <dialog id="shelf-gallery" class="shelf-gallery" aria-labelledby="shelf-gallery-title">
+    <div class="shelf-gallery-heading">
+      <div><span class="eyebrow">A little collection</span><h2 id="shelf-gallery-title"></h2></div>
+      <button type="button" data-close-gallery aria-label="Close photos and return to the scene">Close photos ×</button>
+    </div>
+    <div class="shelf-gallery-content">
+      <div class="shelf-photo-spread"></div>
+      <div class="shelf-gallery-copy" hidden></div>
+    </div>
+  </dialog>
+</body>
+</html>
