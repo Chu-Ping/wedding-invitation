@@ -24,10 +24,10 @@
   conversion, brightness/contrast/saturation adjustments, and a 15% crop from each
   side. The original recording is unchanged and not bundled.
 
-- `resource/images/props/card-en.jpeg` is the user-supplied English invitation
-  card, copied without modification from the provided WhatsApp JPEG. The original
-  `resource/images/props/card-ch.png` is the replacement Chinese card, copied
-  without modification from the user-supplied Chinese vintage invitation PNG.
+- `resource/images/props/card-en.png` is the user-supplied English invitation
+  card, copied without modification from `Vintage Cat Wedding Celebration Poster (1).png`.
+  `resource/images/props/card-ch.jpeg` is the replacement Chinese card, copied
+  without modification from the supplied 20:54:06 WhatsApp JPEG.
 
 - The `metal_pitcher`, `dotted_mug`, `festival`, `berlin`, `malta`, and `czechia`
   folders under `resource/images/photos/` contain 56 additional user-supplied

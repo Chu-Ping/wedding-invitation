@@ -1,4 +1,4 @@
-import { elements } from './scene-elements.js?v=20261108-chinese-card';
+import { elements } from './scene-elements.js?v=20261108-updated-cards';
 import { createShelfGallery } from './shelf-gallery.js?v=20261108-show-invitation';
 import { createItemRewards, itemRewards } from './item-rewards.js?v=20261108-show-invitation';
 import { loadCopy, renderCopy, onLanguageChange, initLanguageControls, setUIText, setUIAttribute } from './i18n.js?v=20261108-show-invitation';

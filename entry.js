@@ -32,7 +32,7 @@ form.addEventListener('submit', async event => {
   setUIText(submit, 'Opening…');
   try {
     // Scene logic, model controls, and music are initialized only after entry.
-    await import('./app.js?v=20261108-soft-glow');
+    await import('./app.js?v=20261108-updated-cards');
     await import('./background-music.js');
     password.value = '';
     invitation.inert = false;

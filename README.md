@@ -6,6 +6,12 @@ A browser-based wedding invitation designed as a small interactive experience. G
 
 ## Project status
 
+Current cards: both Chinese scripts use `resource/images/props/card-ch.jpeg`
+(1024 × 1535), copied unchanged from the supplied 20:54:06 WhatsApp JPEG.
+English uses `resource/images/props/card-en.png` (1024 × 1536), copied unchanged
+from `Vintage Cat Wedding Celebration Poster (1).png`. Both the invitation
+shortcut and cabinet-video completion use these cards and the existing forms.
+
 The header's **Show invitation / 查看喜帖** button sits to the right of Free
 exploration and opens the localized wedding card and embedded RSVP directly,
 without playing the cabinet video or changing guided progress. It remains behind
@@ -53,10 +59,10 @@ and the guided bean → grinder → espresso → cabinet sequence still work.
 
 The Cabinet doors card popup embeds the Microsoft Forms RSVP questionnaire below
 the card image and its adjacent text. Guests complete it inside the invitation.
-English uses `resource/images/props/card-en.jpeg`, copied unchanged from the
-supplied WhatsApp image, and form `https://forms.cloud.microsoft/r/AEARxMLt2u`.
-Traditional and Simplified Chinese both use `resource/images/props/card-ch.png`
-(the supplied Chinese vintage invitation PNG) and form
+English uses `resource/images/props/card-en.png`, copied unchanged from the
+supplied Vintage Cat Wedding Celebration Poster PNG, and form `https://forms.cloud.microsoft/r/AEARxMLt2u`.
+Traditional and Simplified Chinese both use `resource/images/props/card-ch.jpeg`
+(the supplied 20:54:06 WhatsApp JPEG) and form
 `https://forms.cloud.microsoft/r/cEPrTLnGeH`. Language switching updates the card
 and embedded form immediately. The localized photo and resolved `embed=true`
 form URLs are configured in `scene-elements.js`. The surrounding heading and
@@ -72,7 +78,7 @@ so any unsubmitted answers in the previous form are reset. No test response was 
 Both live language-specific questionnaires, the copied English card, initial
 English opening, rapid language switches, and unchanged photo galleries were
 verified in Chrome. The English card matches the supplied file byte for byte.
-The replacement Chinese PNG also matches its supplied source byte for byte and
+The replacement Chinese JPEG also matches its supplied source byte for byte and
 was checked in both Chinese scripts. The superseded Chinese JPEG is archived
 only in ignored `.local-preview/replaced-assets/`.
 
@@ -422,7 +428,7 @@ On entry, the video grows from 40% to fill the available viewing area over
 shows it at full size immediately. The cat animation keeps its existing sizing.
 Reduced motion shows `resource/video/cabinet-doors-poster.jpg` until Play. Playback
 pauses when the tab is hidden and stops on return.
-When the door animation finishes, `resource/images/props/card-ch.png` opens in an
+When the door animation finishes, `resource/images/props/card-ch.jpeg` opens in an
 image popup, growing over 700 ms from the center of the door image into its final
 position while the background gently dims. The card decodes before the reveal;
 reduced motion shows it immediately. `resource/text/cabinet_doors/text.json` appears

@@ -2,6 +2,13 @@
 
 ## Confirmed so far
 
+- Latest card replacements: Chinese uses the supplied 20:54:06 WhatsApp JPEG at
+  `resource/images/props/card-ch.jpeg` (1024 × 1535), for both scripts. English
+  uses `Vintage Cat Wedding Celebration Poster (1).png`, copied unchanged to
+  `resource/images/props/card-en.png` (1024 × 1536). Keep both RSVP forms and
+  all language-switching behavior. Superseded card files stay only in ignored
+  local archives, not the published resource folder.
+
 - Add a three-language Show invitation button immediately after Free exploration
   in the header. After password entry, it directly opens the existing localized
   card/text/embedded RSVP view, bypassing the cabinet video and guided sequence
@@ -18,9 +25,9 @@
   cycle, including inside models. Keep labels opaque and hover/focus feedback
   steady; stop the model pulse when its viewer is inactive or hidden.
 
-- Replace the Chinese wedding card with the supplied Chinese vintage invitation
-  PNG, copied unchanged to `resource/images/props/card-ch.png` (1024 × 1536).
-  Both Traditional and Simplified Chinese use it; English keeps `card-en.jpeg`.
+- Replace the Chinese wedding card with the supplied 20:54:06 WhatsApp
+  JPEG, copied unchanged to `resource/images/props/card-ch.jpeg` (1024 × 1535).
+  Both Traditional and Simplified Chinese use it; English keeps `card-en.png`.
   Keep the existing language-specific embedded RSVP forms.
 
 - Require password `20270206` before entering. Start with the entire invitation
@@ -65,9 +72,9 @@
   `https://forms.cloud.microsoft/r/AEARxMLt2u` for English and
   `https://forms.cloud.microsoft/r/cEPrTLnGeH` for both Chinese scripts, with
   resolved response URLs and `embed=true` in the card's `form` field in
-  `scene-elements.js`. English uses `resource/images/props/card-en.jpeg`, copied
-  unchanged from the supplied WhatsApp JPEG; both Chinese scripts retain the
-  existing `card-ch.png`. Switching language updates the displayed card and form.
+  `scene-elements.js`. English uses `resource/images/props/card-en.png`, copied
+  unchanged from the supplied Vintage Cat Wedding Celebration Poster PNG; both Chinese scripts use the
+  existing `card-ch.jpeg`. Switching language updates the displayed card and form.
   Guests fill it
   inside the card popup. Translate the surrounding heading/frame title into all
   three languages; Microsoft Forms controls the questionnaire itself. Load only
@@ -249,7 +256,7 @@ List the planned scenes in order. Leave this section open until scene ideas are 
   hover/focus/selection glow, Photo frame label, and matching keyboard button.
   Preserve drag-versus-click behavior and real-image comparison.
 - After Cabinet doors finishes its 5.5-second video, automatically open
-  `resource/images/props/card-ch.png` in an accessible image popup. Grow it from
+  `resource/images/props/card-ch.jpeg` in an accessible image popup. Grow it from
   the center of the preceding door image over 700 ms, gently dimming the backdrop.
   Decode the card before revealing it; skip this motion for reduced motion.
   Show `resource/text/cabinet_doors/text.json` to the right of the card, or below on

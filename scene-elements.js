@@ -18,8 +18,8 @@ export const elements = [
         embed: 'https://forms.cloud.microsoft/pages/responsepage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAMAADLcPQtUMjE3NlZLTURVWFRKWEg1VDBBUFIzNjQwUy4u&embed=true',
       },
     }, photos: [
-      { src: 'resource/images/props/card-ch.png', width: 1024, height: 1536, languages: {
-        en: { src: 'resource/images/props/card-en.jpeg', width: 1024, height: 1536 },
+      { src: 'resource/images/props/card-ch.jpeg', width: 1024, height: 1535, languages: {
+        en: { src: 'resource/images/props/card-en.png', width: 1024, height: 1536 },
       } },
     ] },
     video: 'resource/video/cabinet-doors.mp4',
