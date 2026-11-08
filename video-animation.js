@@ -1,4 +1,4 @@
-import { setUIAttribute } from './i18n.js?v=20261108-rsvp-embed';
+import { setUIAttribute } from './i18n.js?v=20261108-show-invitation';
 
 // Decode a local MP4 into the existing animation canvas and playback controls.
 export async function createVideoAnimation(canvas, { video: source, poster, labels }, onState, onComplete = () => {}) {

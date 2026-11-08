@@ -1,5 +1,5 @@
-import { addModelItemInteractions } from './shelf-interactions.js';
-import { photoAlbums } from './photo-albums.js?v=20261108-complete-albums';
+import { addModelItemInteractions } from './shelf-interactions.js?v=20261108-soft-glow';
+import { photoAlbums } from './photo-albums.js?v=20261108-password-gate';
 
 // Regions are in each loaded model's original scene coordinates. Preserve the
 // current GLBs or recalibrate these bounds when replacing/optimizing them again.

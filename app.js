@@ -1,7 +1,7 @@
-import { elements } from './scene-elements.js?v=20261108-cabinet-video';
-import { createShelfGallery } from './shelf-gallery.js?v=20261108-localized-card';
-import { createItemRewards, itemRewards } from './item-rewards.js?v=20261108-rsvp-embed';
-import { loadCopy, renderCopy, onLanguageChange, initLanguageControls, setUIText, setUIAttribute } from './i18n.js?v=20261108-rsvp-embed';
+import { elements } from './scene-elements.js?v=20261108-chinese-card';
+import { createShelfGallery } from './shelf-gallery.js?v=20261108-show-invitation';
+import { createItemRewards, itemRewards } from './item-rewards.js?v=20261108-show-invitation';
+import { loadCopy, renderCopy, onLanguageChange, initLanguageControls, setUIText, setUIAttribute } from './i18n.js?v=20261108-show-invitation';
 
 const stage = document.querySelector('#stage');
 const room = document.querySelector('#room');
@@ -58,9 +58,20 @@ function markElementVisited(element) {
 }
 
 function updateRoomAvailability() {
+  const next = freeExplore ? null : elements.find(item => isElementUnlocked(item) && (
+    item.id === 'pegboard' ? !acquiredItems.has('coffee-bean')
+      : item.id === 'grinder' ? !acquiredItems.has('coffee-ground')
+        : item.id === 'espresso' ? !acquiredItems.has('coffee-mug')
+          : !visitedElements.has(item.id)
+  ));
   elements.forEach(item => {
     const locked = !isElementUnlocked(item);
-    roomControls.get(item.id).forEach(control => { control.hidden = locked; });
+    roomControls.get(item.id).forEach(control => {
+      control.hidden = locked;
+      control.dataset.nextStep = String(item === next);
+      if (item === next) control.setAttribute('aria-current', 'step');
+      else control.removeAttribute('aria-current');
+    });
   });
 }
 let session = 0;
@@ -198,11 +209,19 @@ elements.forEach((element, index) => {
   button.hidden = listButton.hidden = !isElementUnlocked(element);
 });
 
+updateRoomAvailability();
 document.querySelector('#free-explore').addEventListener('click', event => {
   freeExplore = true;
   updateRoomAvailability();
+  viewer?.refreshRewardControls();
   event.currentTarget.setAttribute('aria-pressed', 'true');
   setUIText(event.currentTarget, 'All items unlocked');
+});
+
+document.querySelector('#show-invitation').addEventListener('click', () => {
+  animationPlayer?.pause();
+  const card = elements.find(element => element.id === 'cabinet-doors').animation.completionPhoto;
+  shelfGallery.open(card);
 });
 
 function openElement(element, source) {
@@ -255,8 +274,8 @@ async function openAnimation(element) {
   try {
     if (!animationPlayers.has(element.id)) {
       const pending = (element.animation.video
-        ? import('./video-animation.js?v=20261108-cabinet-video').then(module => module.createVideoAnimation)
-        : import('./frame-animation.js?v=20261108-rsvp-embed').then(module => module.createFrameAnimation)).then(createAnimation =>
+        ? import('./video-animation.js?v=20261108-show-invitation').then(module => module.createVideoAnimation)
+        : import('./frame-animation.js?v=20261108-show-invitation').then(module => module.createFrameAnimation)).then(createAnimation =>
         createAnimation(animationCanvas, element.animation, ({ playing, ended, error }) => {
           if (activeAnimationId !== element.id) return;
           setUIText(animationPlay, playing ? 'Pause' : ended ? 'Play again' : element.animation.playLabel);
@@ -286,7 +305,7 @@ async function openAnimation(element) {
     setUIText(hint, element.animation.hint);
     hint.hidden = false;
     photoTitle.focus({ preventScroll: true });
-    if (!reducedMotion.matches && !document.hidden) animationPlayer.play();
+    if (!reducedMotion.matches && !document.hidden && !galleryDialog.open && !rewardDialog.open) animationPlayer.play();
   } catch (error) {
     if (session !== thisSession) return;
     setStatus('The animation could not load. Try again, or return to the room.', true);
@@ -299,8 +318,14 @@ animationCanvas.addEventListener('pointerenter', event => {
 });
 animationCanvas.addEventListener('pointerleave', () => animationPlayer?.setHovered(false));
 document.querySelector('#animation-replay').addEventListener('click', () => animationPlayer?.replay());
-document.addEventListener('visibilitychange', () => { if (document.hidden) animationPlayer?.pause(); });
-reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) animationPlayer?.pause(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) animationPlayer?.pause();
+  viewer?.refreshRewardControls();
+});
+reducedMotion.addEventListener('change', () => {
+  if (reducedMotion.matches) animationPlayer?.pause();
+  viewer?.refreshRewardControls();
+});
 
 async function showPhoto(element, index) {
   const thisSession = ++session;
@@ -363,12 +388,12 @@ async function createViewer() {
     import('three/addons/loaders/GLTFLoader.js'),
     import('three/addons/controls/OrbitControls.js'),
     import('three/addons/environments/RoomEnvironment.js'),
-    import('./espresso-glow.js'),
-    import('./shelf-interactions.js?v=20261108-shelf-copy'),
+    import('./espresso-glow.js?v=20261108-soft-glow'),
+    import('./shelf-interactions.js?v=20261108-soft-glow'),
     import('./vendor/meshoptimizer/meshopt_decoder.js'),
-    import('./pegboard-interactions.js'),
-    import('./cabinet-interactions.js?v=20261108-complete-albums'),
-    import('./grinder-interactions.js'),
+    import('./pegboard-interactions.js?v=20261108-soft-glow'),
+    import('./cabinet-interactions.js?v=20261108-password-gate'),
+    import('./grinder-interactions.js?v=20261108-soft-glow'),
   ]);
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
@@ -400,6 +425,21 @@ async function createViewer() {
   let model;
   let framingBounds;
   let itemInteraction;
+  let guidedHint = null;
+  let hintFrame;
+  let lastHintFrame = 0;
+  function scheduleHintPulse() {
+    cancelAnimationFrame(hintFrame);
+    if (active && guidedHint && !reducedMotion.matches && !document.hidden) hintFrame = requestAnimationFrame(pulseHint);
+  }
+  function pulseHint(time) {
+    if (!active || !guidedHint || reducedMotion.matches || document.hidden) return;
+    if (time - lastHintFrame >= 1000 / 30) {
+      lastHintFrame = time;
+      render();
+    }
+    hintFrame = requestAnimationFrame(pulseHint);
+  }
   const shelfButtons = document.querySelector('#shelf-object-buttons');
   const shelfSelection = document.querySelector('#shelf-selection');
   const coffeeBagButton = document.querySelector('#coffee-bag-button');
@@ -419,6 +459,21 @@ async function createViewer() {
     espressoButton.setAttribute('aria-pressed', String(mug));
     setUIText(pegboardSelection, beans ? 'Coffee bean acquired' : '');
     setUIText(espressoSelection, mug ? 'Coffee mug acquired' : '');
+    const guides = [
+      [coffeeBagButton, !freeExplore && !beans, 'pegboard', coffeeBag.id],
+      [grinderControl, !freeExplore && beans && !grounds, 'grinder', grinderButton.id],
+      [espressoButton, !freeExplore && beans && visitedElements.has('grinder') && !mug, 'espresso', espressoCenterButton.id],
+    ];
+    let hint = null;
+    for (const [button, guided, sceneId, itemId] of guides) {
+      button.dataset.nextStep = String(guided);
+      if (guided && modelView.dataset.model === sceneId) hint = itemId;
+    }
+    itemInteraction?.setHint?.(hint);
+    guidedHint = hint;
+    scheduleHintPulse();
+    if (hint === null && ['pegboard', 'grinder', 'espresso'].includes(modelView.dataset.model)) itemInteraction?.select(null);
+    render();
   }
   function selectModelItem(id) {
     if (!active || !itemInteraction) return;
@@ -584,6 +639,7 @@ async function createViewer() {
     } else {
       itemInteraction?.updateHover(null);
     }
+    itemInteraction?.setPulse?.(reducedMotion.matches ? 1 : .5 - .5 * Math.cos(performance.now() * 2 * Math.PI / 2600));
     renderer.render(scene, camera);
   }
   renderer.domElement.addEventListener('pointermove', event => {
@@ -709,7 +765,7 @@ async function createViewer() {
   return { action, reset, render, prepareModel, selectModel, refreshRewardControls, setActive(value) {
     active = value; pointer = null; dragging = false; press = null;
     itemInteraction?.setActive(value);
-    render();
+    refreshRewardControls();
   } };
 }
 

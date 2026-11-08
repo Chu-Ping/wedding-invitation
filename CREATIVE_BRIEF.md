@@ -2,6 +2,52 @@
 
 ## Confirmed so far
 
+- Add a three-language Show invitation button immediately after Free exploration
+  in the header. After password entry, it directly opens the existing localized
+  card/text/embedded RSVP view, bypassing the cabinet video and guided sequence
+  without changing progress or free-exploration state. Pause an active animation
+  before opening, and restore the current view/focus on close.
+
+- Glow the next actionable item in the guided clicking sequence: highlight its
+  room hotspot/menu button, and guide the coffee bag, grinder button, and espresso
+  center button inside their models until their rewards are acquired. Advance
+  other room hints on visits, following existing unlock rules. Use warm gold,
+  keep hover/focus interaction, remove sequence hints in free exploration, and
+  replace the pulse with a steady glow for reduced motion.
+  Pulse guidance smoothly between invisible and full glow over a 2.6-second
+  cycle, including inside models. Keep labels opaque and hover/focus feedback
+  steady; stop the model pulse when its viewer is inactive or hidden.
+
+- Replace the Chinese wedding card with the supplied Chinese vintage invitation
+  PNG, copied unchanged to `resource/images/props/card-ch.png` (1024 × 1536).
+  Both Traditional and Simplified Chinese use it; English keeps `card-en.jpeg`.
+  Keep the existing language-specific embedded RSVP forms.
+
+- Require password `20270206` before entering. Start with the entire invitation
+  blurred and inert, with only the password screen and its language control
+  usable. Defer room logic and music initialization until the correct password.
+  Wrong/empty passwords and Escape must not reveal or unlock anything. Support
+  all three languages, keyboard entry, and responsive layouts. Reloading locks
+  the page again. This is a browser-level visual gate on the static site, not
+  server-side protection of publicly hosted assets.
+
+- Move all three-language title/context fields from `pegboard/text.json` to
+  `coffee_bean/text.json`, from `grinder/text.json` to `coffee_ground/text.json`,
+  and from `espresso_machine/text.json` to `coffee_mug/text.json`, replacing the
+  previous item popup copy exactly. Clear the original source model copy so it
+  copy appears only after clicking the coffee bag, grinder button, or espresso
+  center button. The linked model sources instead show short prompts in all
+  three languages: Pegboard “Find the coffee bean”; Grinder “Find the grinder
+  button”; Espresso “Find the start button.” Keep their title fields empty. Preserve
+  reward images, buttons, language switching, and guided progression.
+
+- Treat a HEIC/JPEG still and same-stem MP4 companion as one Live Photo: keep
+  the still photo only. Use first-frame stills only for standalone MP4s. Removed
+  six duplicate companion images from the runtime manifest and photo folder:
+  item 07 now has 17 images, item 13 has 5, and item 14 has 9. Other albums are
+  unchanged; the current total is 224 images across 20 albums. Apply this rule
+  both to external imports and already-generated manifests.
+
 - Cabinet doors uses the supplied `IMG_5353.MOV` segment 00:11–00:22, exported
   locally at 2x speed as `resource/video/cabinet-doors.mp4` (5.5 seconds, 30 fps).
   Crop 15% from each horizontal side, keeping the middle 70% at 896 × 720.
@@ -21,7 +67,7 @@
   resolved response URLs and `embed=true` in the card's `form` field in
   `scene-elements.js`. English uses `resource/images/props/card-en.jpeg`, copied
   unchanged from the supplied WhatsApp JPEG; both Chinese scripts retain the
-  existing `card.jpeg`. Switching language updates the displayed card and form.
+  existing `card-ch.png`. Switching language updates the displayed card and form.
   Guests fill it
   inside the card popup. Translate the surrounding heading/frame title into all
   three languages; Microsoft Forms controls the questionnaire itself. Load only
@@ -35,13 +81,15 @@
   in both languages, keeping 2025 as explicitly requested. The supplied split
   Friends folders 05, 06, and 07 now map to `striped-mug`, `blue-mug`, and
   `dark-cup`, using `friends_05`, `friends_06`, and `friends_07` respectively.
-  Each has 18 gallery images. For 07, show nine photos plus first-frame JPEGs
-  from nine MP4s, without video playback. Preserve all source files unchanged.
+  Folders 05 and 06 have 18 images each. Folder 07 has 17 images: nine photos
+  and eight standalone MP4 first-frame stills, excluding its matching video
+  companion. Preserve all source files unchanged.
   Further supplied collections: 08 `teacup` → `family` (11), 13 `small-jar` →
-  `china_13` (8), 14 `hanging-left` → `leuven_14` (11), 15 `hanging-middle-left`
+  `china_13` (5), 14 `hanging-left` → `leuven_14` (9), 15 `hanging-middle-left`
   → `leuven_15` (11), 16 `hanging-middle-right` → `leuven_16` (12), and
-  17 `hanging-right` → `netherlands_17` (10). Items 13 and 14 each include three
-  MP4 first-frame stills. There are 230 browser images in 20 active albums.
+  17 `hanging-right` → `netherlands_17` (10). Item 13 contains only its five
+  photos; item 14 includes one standalone MP4 first-frame still. There are
+  224 browser images in 20 active albums.
   Keep only gallery-used images under `resource/images/photos/`; remove local
   source copies, unused formats, and the earlier unlinked Friends copy. External
   Downloads sources stay unchanged. Prepare directly from external folders/ZIPs
@@ -96,7 +144,8 @@
   Chinese characters consistently in `_chs`, with identical wording and meaning.
   Preserve names, punctuation, emojis, and line breaks when correcting scripts.
   Language buttons cycle Traditional Chinese → English → Simplified Chinese,
-  showing the next language's name; use `zh-Hant`, `en`, and `zh-Hans` for the
+  displaying `En - 繁 - 简` on every language button, with an accessible label
+  naming the next language; use `zh-Hant`, `en`, and `zh-Hans` for the
   document language. Translate interface labels as well as source JSON. Preserve original
   Chinese copy and provide English translations. Show the chosen language's
   title and body on its existing page/popup. Chinese is the initial default;
@@ -200,7 +249,7 @@ List the planned scenes in order. Leave this section open until scene ideas are 
   hover/focus/selection glow, Photo frame label, and matching keyboard button.
   Preserve drag-versus-click behavior and real-image comparison.
 - After Cabinet doors finishes its 5.5-second video, automatically open
-  `resource/images/props/card.jpeg` in an accessible image popup. Grow it from
+  `resource/images/props/card-ch.png` in an accessible image popup. Grow it from
   the center of the preceding door image over 700 ms, gently dimming the backdrop.
   Decode the card before revealing it; skip this motion for reduced motion.
   Show `resource/text/cabinet_doors/text.json` to the right of the card, or below on

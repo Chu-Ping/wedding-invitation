@@ -1,4 +1,9 @@
 const chinese = {
+  'Show invitation': '查看喜帖',
+  'Enter the invitation password': '請輸入邀請密碼',
+  'Password': '密碼', 'Enter': '進入', 'Opening…': '開啟中…',
+  'Incorrect password. Please try again.': '密碼不正確，請再試一次。',
+  'The invitation could not load. Please try again.': '無法載入邀請，請再試一次。',
   'RSVP': '填寫出席回覆',
   'RSVP questionnaire': '出席回覆表單',
   'No photos have been added yet.': '目前尚未加入照片。',
@@ -52,6 +57,11 @@ const chinese = {
 
 // Explicit Simplified Chinese interface copy; no runtime conversion dependency.
 const simplifiedChinese = {
+  "Show invitation": "查看喜帖",
+  "Enter the invitation password": "请输入邀请密码",
+  "Password": "密码", "Enter": "进入", "Opening…": "开启中…",
+  "Incorrect password. Please try again.": "密码不正确，请再试一次。",
+  "The invitation could not load. Please try again.": "无法载入邀请，请再试一次。",
   "RSVP": "填写出席回复",
   "RSVP questionnaire": "出席回复表单",
   "No photos have been added yet.": "目前尚未加入照片。",
@@ -186,15 +196,18 @@ export function setLanguage(value) {
   }
   document.querySelectorAll('[data-language-toggle]').forEach(button => {
     const next = languageDetails[languages[(languages.indexOf(language) + 1) % languages.length]];
-    button.textContent = next.label;
+    button.textContent = 'En - 繁 - 简';
     button.setAttribute('aria-label', `${t('Switch language')}: ${next.label}`);
   });
   listeners.forEach(listener => listener());
 }
+const initializedLanguageButtons = new WeakSet();
 export function initLanguageControls() {
   document.querySelectorAll('[data-i18n]').forEach(element => setUIText(element, element.dataset.i18n));
   document.querySelectorAll('[data-i18n-label]').forEach(element => setUIAttribute(element, 'aria-label', element.dataset.i18nLabel));
   document.querySelectorAll('[data-language-toggle]').forEach(button => {
+    if (initializedLanguageButtons.has(button)) return;
+    initializedLanguageButtons.add(button);
     button.addEventListener('click', () => setLanguage(languages[(languages.indexOf(language) + 1) % languages.length]));
   });
   setLanguage(language);

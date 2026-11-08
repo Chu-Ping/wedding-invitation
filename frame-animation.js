@@ -1,4 +1,4 @@
-import { setUIAttribute } from './i18n.js?v=20261108-rsvp-embed';
+import { setUIAttribute } from './i18n.js?v=20261108-show-invitation';
 
 // Frame playback uses elapsed time so timer drift does not change the requested fps.
 export async function createFrameAnimation(canvas, { frames, fps, labels, pauseOnHover = false, loop = false }, onState, onComplete = () => {}) {

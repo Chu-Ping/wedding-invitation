@@ -104,9 +104,15 @@ export function addModelItemInteractions(model, items, onHover) {
   let hovered = null;
   let focused = null;
   let selected = null;
+  let hinted = null;
+  let pulse = 1;
   let active = false;
   function refresh() {
-    const id = hovered ?? focused ?? selected;
+    const id = hovered ?? focused ?? selected ?? hinted;
+    const strength = id === hinted && !hovered && !focused && !selected ? pulse : 1;
+    material.uniforms.strength.value = .65 * strength;
+    const halo = overlays.get(id)?.children[1];
+    if (halo) halo.material.uniforms.strength.value = .23 * strength;
     overlays.forEach((overlay, key) => { overlay.visible = active && key === id; });
   }
   function pick(raycaster) {
@@ -124,6 +130,8 @@ export function addModelItemInteractions(model, items, onHover) {
     },
     focus(id) { focused = id; refresh(); },
     select(id) { selected = id; refresh(); },
+    setHint(id) { hinted = id; refresh(); },
+    setPulse(value) { pulse = value; refresh(); },
     setActive(value) {
       active = value;
       hovered = focused = null;

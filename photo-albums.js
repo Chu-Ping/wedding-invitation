@@ -793,11 +793,6 @@ export const photoAlbums = {
       "height": 1200
     },
     {
-      "src": "resource/images/photos/friends_07/web/img_0930-first-frame.jpg",
-      "width": 1600,
-      "height": 1200
-    },
-    {
       "src": "resource/images/photos/friends_07/web/img_2141.jpg",
       "width": 1600,
       "height": 1200
@@ -937,17 +932,7 @@ export const photoAlbums = {
       "height": 1600
     },
     {
-      "src": "resource/images/photos/china_13/web/img_4553-first-frame.jpg",
-      "width": 1600,
-      "height": 1200
-    },
-    {
       "src": "resource/images/photos/china_13/web/img_4673.jpg",
-      "width": 1600,
-      "height": 1200
-    },
-    {
-      "src": "resource/images/photos/china_13/web/img_4673-first-frame.jpg",
       "width": 1600,
       "height": 1200
     },
@@ -955,11 +940,6 @@ export const photoAlbums = {
       "src": "resource/images/photos/china_13/web/img_4848.jpg",
       "width": 1600,
       "height": 1200
-    },
-    {
-      "src": "resource/images/photos/china_13/web/img_4848-first-frame.jpg",
-      "width": 1200,
-      "height": 1600
     }
   ],
   "hanging-left": [
@@ -999,17 +979,7 @@ export const photoAlbums = {
       "height": 1200
     },
     {
-      "src": "resource/images/photos/leuven_14/web/img_5607-first-frame.jpg",
-      "width": 1600,
-      "height": 1200
-    },
-    {
       "src": "resource/images/photos/leuven_14/web/img_9873.jpg",
-      "width": 1600,
-      "height": 1200
-    },
-    {
-      "src": "resource/images/photos/leuven_14/web/img_9873-first-frame.jpg",
       "width": 1600,
       "height": 1200
     },

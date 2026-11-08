@@ -1,25 +1,43 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" class="invitation-locked">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    .invitation-locked #invitation { filter: blur(28px); pointer-events: none; user-select: none; }
+    .password-gate { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: #eeece2cc; }
+    [hidden] { display: none !important; }
+  </style>
   <title data-i18n="Invitation：佑琦 &amp; 竹平">Invitation：佑琦 &amp; 竹平</title>
-  <link rel="stylesheet" href="styles.css?v=20261108-video-entrance">
+  <link rel="stylesheet" href="styles.css?v=20261108-soft-glow">
   <script type="importmap">
     { "imports": {
       "three": "./vendor/three/build/three.module.js",
       "three/addons/": "./vendor/three/examples/jsm/"
     } }
   </script>
-  <script type="module" src="app.js?v=20261108-cabinet-video"></script>
-  <script type="module" src="background-music.js"></script>
+  <script type="module" src="entry.js?v=20261108-soft-glow"></script>
 </head>
 <body>
+  <section id="password-gate" class="password-gate" role="dialog" aria-modal="true" aria-labelledby="password-title">
+    <div class="password-panel">
+      <div class="password-heading"><h1 id="password-title" data-i18n="Enter the invitation password">請輸入邀請密碼</h1><button type="button" data-language-toggle>En - 繁 - 简</button></div>
+      <form id="password-form" method="post">
+        <label for="invitation-password" data-i18n="Password">密碼</label>
+        <input id="invitation-password" type="password" inputmode="numeric" autocomplete="current-password" required aria-describedby="password-error" autofocus>
+        <p id="password-error" role="status" aria-live="polite" hidden></p>
+        <button id="password-submit" type="submit" data-i18n="Enter" disabled>進入</button>
+      </form>
+      <noscript><p>Enable JavaScript to enter. / 請啟用 JavaScript。 / 请启用 JavaScript。</p></noscript>
+    </div>
+  </section>
+  <div id="invitation" inert>
   <header class="page-header">
     <div><span class="eyebrow" data-i18n="Invitation：佑琦 &amp; 竹平">Invitation：佑琦 &amp; 竹平</span><h1 data-i18n="Explore our room">Explore our room</h1></div>
     <div class="header-controls">
-      <button id="language-toggle" type="button" data-language-toggle>English</button>
+      <button id="language-toggle" type="button" data-language-toggle>En - 繁 - 简</button>
       <button id="free-explore" type="button" aria-pressed="false" aria-controls="hotspots object-list" data-i18n="Free exploration">Free exploration</button>
+      <button id="show-invitation" type="button" aria-haspopup="dialog" aria-controls="shelf-gallery" data-i18n="Show invitation">Show invitation</button>
     </div>
     <p id="scene-hint" hidden></p>
   </header>
@@ -88,7 +106,7 @@
     <div class="shelf-gallery-heading">
       <h2 id="item-reward-title"></h2>
       <div class="dialog-actions">
-        <button type="button" data-language-toggle>English</button>
+        <button type="button" data-language-toggle>En - 繁 - 简</button>
         <button type="button" data-reward-close data-i18n="Close ×" data-i18n-label="Close item and return to the model" aria-label="Close item and return to the model">Close ×</button>
       </div>
     </div>
@@ -103,7 +121,7 @@
     <div class="shelf-gallery-heading">
       <div><span class="eyebrow" data-i18n="A little collection">A little collection</span><h2 id="shelf-gallery-title"></h2></div>
       <div class="dialog-actions">
-        <button type="button" data-language-toggle>English</button>
+        <button type="button" data-language-toggle>En - 繁 - 简</button>
         <button type="button" data-close-gallery data-i18n="Close photos ×" data-i18n-label="Close photos and return to the scene" aria-label="Close photos and return to the scene">Close photos ×</button>
       </div>
     </div>
@@ -116,5 +134,6 @@
       <iframe class="rsvp-form" data-gallery-form title="RSVP questionnaire"></iframe>
     </div>
   </dialog>
+  </div>
 </body>
 </html>

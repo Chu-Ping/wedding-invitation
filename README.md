@@ -6,11 +6,57 @@ A browser-based wedding invitation designed as a small interactive experience. G
 
 ## Project status
 
+The header's **Show invitation / 查看喜帖** button sits to the right of Free
+exploration and opens the localized wedding card and embedded RSVP directly,
+without playing the cabinet video or changing guided progress. It remains behind
+the password gate. Opening it during an animation pauses playback; closing it
+returns to the existing view and restores focus to the button.
+Verified in Chrome: direct entry in all languages preserves guided progress,
+restores keyboard focus, and pauses an active cabinet video. Smooth glow
+interpolation, live model pulsing, readable labels, and reduced-motion mode
+were checked without submitting an RSVP response.
+
+Guided exploration highlights the next room hotspot and its matching menu
+button with a soft gold pulse. Coffee steps stay highlighted until their item is
+acquired; later room steps advance when visited. Inside Pegboard, Grinder, and
+Espresso, the uncollected bag/button also glows without hovering. Existing hover
+and keyboard glows remain available. Free exploration removes sequence hints;
+reduced motion uses a steady glow. Unlock requirements are unchanged.
+The guidance glow fades smoothly from 0% to 100% and back over 2.6 seconds.
+Only the highlight fades; labels stay readable. Guided model overlays use the
+same gradual pulse, while normal hover/focus feedback remains steady. Model
+pulse rendering stops when inactive, hidden, or reduced motion is enabled.
+
+Each page load starts with a password screen. The invitation is blurred and
+`inert` until password `20270206` is entered. `entry.js` initializes the room
+logic and music only after a correct password; wrong passwords keep everything
+locked. The gate supports all three languages and keyboard entry. Reloading
+locks the page again; no password or unlock flag is stored in browser storage.
+This is a client-side visual entry gate, not server authentication: the password
+and assets remain accessible to someone inspecting a public GitHub Pages site.
+Verified in Chrome: wrong passwords, Escape, keyboard focus isolation, all three
+languages, mobile layout, successful entry, room/reward interactions, refresh
+relocking, and the JavaScript-disabled locked state.
+
+Coffee interaction text is shown when its item is clicked: Pegboard's original
+copy now lives in `coffee_bean/text.json` (coffee bag), Grinder's in
+`coffee_ground/text.json` (grinder button), and Espresso machine's in
+`coffee_mug/text.json` (center button). Each replaces the previous item copy in
+all three languages. The linked `pegboard`, `grinder`, and `espresso_machine`
+JSON files now show short prompts on their model pages: “Find the coffee bean,”
+“Find the grinder button,” and “Find the start button,” in all three languages.
+Their titles remain empty; object headings, buttons, rewards, and progression
+are unchanged.
+Verified in Chrome: all three popups match the original model copy in English,
+Traditional Chinese, and Simplified Chinese; keyboard activation, focus return,
+and the guided bean → grinder → espresso → cabinet sequence still work.
+
 The Cabinet doors card popup embeds the Microsoft Forms RSVP questionnaire below
 the card image and its adjacent text. Guests complete it inside the invitation.
 English uses `resource/images/props/card-en.jpeg`, copied unchanged from the
 supplied WhatsApp image, and form `https://forms.cloud.microsoft/r/AEARxMLt2u`.
-Traditional and Simplified Chinese both use the original `card.jpeg` and form
+Traditional and Simplified Chinese both use `resource/images/props/card-ch.png`
+(the supplied Chinese vintage invitation PNG) and form
 `https://forms.cloud.microsoft/r/cEPrTLnGeH`. Language switching updates the card
 and embedded form immediately. The localized photo and resolved `embed=true`
 form URLs are configured in `scene-elements.js`. The surrounding heading and
@@ -26,6 +72,9 @@ so any unsubmitted answers in the previous form are reset. No test response was 
 Both live language-specific questionnaires, the copied English card, initial
 English opening, rapid language switches, and unchanged photo galleries were
 verified in Chrome. The English card matches the supplied file byte for byte.
+The replacement Chinese PNG also matches its supplied source byte for byte and
+was checked in both Chinese scripts. The superseded Chinese JPEG is archived
+only in ignored `.local-preview/replaced-assets/`.
 
 The old numbered photo collection has been removed. Replacement albums now use
 one dedicated folder per item, mapped in `photo-albums.json`:
@@ -41,14 +90,14 @@ one dedicated folder per item, mapped in `photo-albums.json`:
 | Shelf 04 Dotted Mug (`dotted-mug`) | `resource/images/photos/dotted_mug/` | 11 |
 | Shelf 05 Green Striped Mug (`striped-mug`) | `resource/images/photos/friends_05/` | 18 |
 | Shelf 06 Blue Mug (`blue-mug`) | `resource/images/photos/friends_06/` | 18 |
-| Shelf 07 Dark Cup and Saucer (`dark-cup`) | `resource/images/photos/friends_07/` | 18 |
+| Shelf 07 Dark Cup and Saucer (`dark-cup`) | `resource/images/photos/friends_07/` | 17 |
 | Shelf 08 Patterned Teacup and Saucer (`teacup`) | `resource/images/photos/family/` | 11 |
 | Shelf 09 Tall Illustrated Tin (`tin`) | `resource/images/photos/festival/` | 14 |
 | Shelf 10 Square Canister (`canister`) | `resource/images/photos/berlin/` | 8 |
 | Shelf 11 White Coffee Bag (`white-bag`) | `resource/images/photos/malta/` | 8 |
 | Shelf 12 Beige Coffee Bag (`beige-bag`) | `resource/images/photos/czechia/` | 6 |
-| Shelf 13 Small Clear Jar (`small-jar`) | `resource/images/photos/china_13/` | 8 |
-| Shelf 14 Hanging Cup 1 (`hanging-left`) | `resource/images/photos/leuven_14/` | 11 |
+| Shelf 13 Small Clear Jar (`small-jar`) | `resource/images/photos/china_13/` | 5 |
+| Shelf 14 Hanging Cup 1 (`hanging-left`) | `resource/images/photos/leuven_14/` | 9 |
 | Shelf 15 Hanging Cup 2 (`hanging-middle-left`) | `resource/images/photos/leuven_15/` | 11 |
 | Shelf 16 Hanging Cup 3 (`hanging-middle-right`) | `resource/images/photos/leuven_16/` | 12 |
 | Shelf 17 Hanging Cup 4 (`hanging-right`) | `resource/images/photos/netherlands_17/` | 10 |
@@ -56,8 +105,9 @@ one dedicated folder per item, mapped in `photo-albums.json`:
 Each album keeps only the used `web/` JPEGs in the repository (up to 1600 pixels,
 orientation applied, EXIF omitted). Unused source copies, unsupported formats,
 and the old unlinked Friends collection have been removed from the photo directory.
-Sources in Downloads remain unchanged. Items 07, 13, and 14 include MP4 first-frame
-stills (nine, three, and three respectively); videos do not play in the galleries.
+Sources in Downloads remain unchanged. Standalone MP4s use first-frame stills (eight in item 07 and one in item 14).
+When a HEIC/JPEG photo and MP4 share a filename stem, only the photo is shown;
+the Live Photo video companion is excluded. Videos do not play in the galleries.
 Other albums exclude companion videos unless explicitly enabled. Browser copies
 and the generated `photo-albums.js` must be committed for publishing.
 Unassigned items show the bilingual empty-album message. Models, rewards,
@@ -81,7 +131,10 @@ Legacy `originals/` folders are still supported if present, but are not required
 To include MP4 first-frame stills, install OpenCV (`opencv-python`) locally and
 use an object instead of a folder string for that album, for example:
 `"dark-cup": {"folder": "resource/images/photos/friends_07", "video_first_frame": true}`.
-Extracted JPEGs end in `-first-frame.jpg`, keeping photos with the same stem distinct.
+Standalone extracted JPEGs end in `-first-frame.jpg`.
+Live Photo companion MP4s with a matching still-photo stem are skipped, keeping
+the photo rather than displaying a second version of the same moment. Existing
+generated companion duplicates are also cleaned when running the preparer.
 
 The preparer writes `photo-albums.js`, shared by cabinet and shelf item buttons.
 Use `cabinet-photo-frame` for the Cabinet right frame; shelf item IDs are listed
@@ -89,8 +142,8 @@ in `shelf-interactions.js` (for example `dripper` or `blue-mug`). Items absent f
 the folder map stay empty. No directory listing server, service, or build is
 needed for guests; this script is only an authoring step when photos change.
 
-There are now 230 gallery images in twenty item albums: all 17 shelf items and
-three cabinet item buttons. Friends folders 05, 06, and 07 have 18 images each.
+There are now 224 gallery images in twenty item albums: all 17 shelf items and
+three cabinet item buttons. Friends folders 05 and 06 have 18 images each; folder 07 has 17.
 Item 12's bilingual context now says Czechia Trip, retaining the year 2025.
 
 Verified in Chrome: the actual
@@ -100,12 +153,13 @@ controls, narrow layouts, and Close/focus return work without failed assets or
 uncaught exceptions. The six newest albums were also checked for exact image
 lists, bilingual copy, full-width photo layout, keyboard focus, and narrow-screen
 overflow. Friends items 05–07 were checked through their actual model surfaces:
-18 images each, matching bilingual copy, correct first-frame stills for all nine
-MP4s, close/focus return, and narrow-screen overflow. The final six albums were
+matching copy, standalone first-frame stills, close/focus return, and narrow-screen
+overflow. The final six albums were
 checked through their model surfaces in all three languages; all 17 shelf
 galleries were checked again after cleanup. The photo directory contains exactly
-230 used JPEGs; 227 unused source/duplicate files (about 493 MiB) were removed.
-All six new MP4 stills match their first decoded frames.
+224 used JPEGs after removing six duplicate Live Photo companion stills. All 17
+shelf galleries were rechecked in Chrome after that correction. The earlier
+cleanup removed 227 unused source/duplicate files (about 493 MiB).
 
 **09 / Photo shelves** opens `resource/model/shelf.optimized.glb` with the shared zoom,
 3D controls, exposure, and real room photo comparison. `shelf.jpg` is retained
@@ -252,7 +306,8 @@ page/popup fetches fresh JSON without rebuilding any manifest.
 
 The existing Chinese option is the default. The language button cycles through
 Traditional Chinese → English → Simplified Chinese → Traditional Chinese,
-showing the name of the next language. It changes interface
+showing the fixed label **En - 繁 - 简**. Its accessible label names the next
+language. It changes interface
 labels, JSON titles, and body copy immediately without restarting the current
 model, animation, music, or popup. The same toggle is inside reward and photo
 popups, where native modal focus keeps the header inaccessible. The selected
@@ -367,7 +422,7 @@ On entry, the video grows from 40% to fill the available viewing area over
 shows it at full size immediately. The cat animation keeps its existing sizing.
 Reduced motion shows `resource/video/cabinet-doors-poster.jpg` until Play. Playback
 pauses when the tab is hidden and stops on return.
-When the door animation finishes, `resource/images/props/card.jpeg` opens in an
+When the door animation finishes, `resource/images/props/card-ch.png` opens in an
 image popup, growing over 700 ms from the center of the door image into its final
 position while the background gently dims. The card decodes before the reveal;
 reduced motion shows it immediately. `resource/text/cabinet_doors/text.json` appears

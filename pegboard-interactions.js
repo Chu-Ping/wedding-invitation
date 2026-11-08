@@ -1,4 +1,4 @@
-import { addModelItemInteractions } from './shelf-interactions.js';
+import { addModelItemInteractions } from './shelf-interactions.js?v=20261108-soft-glow';
 
 // Calibrated in the original pegboard.glb coordinates. The depth threshold
 // separates the coffee bag from the board behind it, including through holes.

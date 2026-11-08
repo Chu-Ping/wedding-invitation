@@ -1,4 +1,4 @@
-import { getLanguage, loadCopy, translatedCopy, onLanguageChange, setUIText, setUIAttribute, t } from './i18n.js?v=20261108-rsvp-embed';
+import { getLanguage, loadCopy, translatedCopy, onLanguageChange, setUIText, setUIAttribute, t } from './i18n.js?v=20261108-show-invitation';
 
 export function createShelfGallery(dialog, { onOpen, onClose }) {
   const title = dialog.querySelector('h2');
@@ -83,7 +83,7 @@ export function createShelfGallery(dialog, { onOpen, onClose }) {
       if (!set) {
         try {
           // Room startup does not depend on loading or validating photo albums.
-          const { photoAlbums } = await import('./photo-albums.js?v=20261108-complete-albums');
+          const { photoAlbums } = await import('./photo-albums.js?v=20261108-password-gate');
           set = photoAlbums[item.id] ?? [];
         } catch {
           if (request !== thisRequest) return;

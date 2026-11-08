@@ -1,4 +1,4 @@
-import { shelfPhotoSets } from './shelf-photos.js?v=20261108-photos-reset';
+import { shelfPhotoSets } from './shelf-photos.js?v=20261108-password-gate';
 
 // Shelf item order is left to right, top to bottom. Values are source set numbers.
 export const shelfAlbumSets = [

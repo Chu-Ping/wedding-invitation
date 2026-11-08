@@ -1,4 +1,4 @@
-import { addButtonGlow } from './espresso-glow.js';
+import { addButtonGlow } from './espresso-glow.js?v=20261108-soft-glow';
 
 // Original grinder GLB coordinates: the silver button on the lower-right side.
 export const grinderButton = {

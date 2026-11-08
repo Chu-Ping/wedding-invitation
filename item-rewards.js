@@ -1,4 +1,4 @@
-import { loadCopy, translatedCopy, onLanguageChange, setUIText, t } from './i18n.js?v=20261108-rsvp-embed';
+import { loadCopy, translatedCopy, onLanguageChange, setUIText, t } from './i18n.js?v=20261108-show-invitation';
 
 export const itemRewards = {
   coffeeBean: {

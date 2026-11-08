@@ -53,7 +53,12 @@ export function addButtonGlow(model, button, onHover = () => {}) {
   let active = false;
   let hovered = false;
   let focused = false;
-  function refresh() { group.children[0].visible = active && (hovered || focused); }
+  let hinted = false;
+  let pulse = 1;
+  function refresh() {
+    group.children[0].visible = active && (hovered || focused || hinted);
+    material.opacity = .75 * (hinted && !hovered && !focused ? pulse : 1);
+  }
   function pick(raycaster) {
     const hit = raycaster?.intersectObjects(surfaces, false)[0];
     if (!hit) return null;
@@ -69,6 +74,8 @@ export function addButtonGlow(model, button, onHover = () => {}) {
       refresh();
     },
     focus(id) { focused = id === button.id; refresh(); },
+    setHint(id) { hinted = id === button.id; refresh(); },
+    setPulse(value) { pulse = value; refresh(); },
     select() {}, // Selection feedback is provided by the viewer; glow remains hover/focus-only.
     setActive(value) {
       active = value;
