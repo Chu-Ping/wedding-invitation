@@ -21,7 +21,7 @@ export const shelfItems = [
   ['hanging-middle-left', 'Hanging cup 2', [-.04, -.95, .18, -.59]],
   ['hanging-middle-right', 'Hanging cup 3', [.18, -.95, .42, -.59]],
   ['hanging-right', 'Hanging cup 4', [.42, -.95, .71, -.59]],
-].map(([id, label, bounds]) => ({ id, label, bounds }));
+].map(([id, label, bounds]) => ({ id, label, bounds, text: `resource/text/photo_shelves/${id}/text.json` }));
 
 function contains(item, point) {
   const [left, bottom, right, top] = item.bounds;

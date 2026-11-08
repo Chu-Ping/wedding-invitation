@@ -1,0 +1,31 @@
+{
+  "cabinet-vase": "resource/images/photos/cabinet_top",
+  "cabinet-can": "resource/images/photos/beer_can",
+  "cabinet-photo-frame": "resource/images/photos/photo_frame",
+  "dripper": "resource/images/photos/coffee_dripper",
+  "jar": "resource/images/photos/white_storage_jar",
+  "pitcher": "resource/images/photos/metal_pitcher",
+  "dotted-mug": "resource/images/photos/dotted_mug",
+  "tin": "resource/images/photos/festival",
+  "canister": "resource/images/photos/berlin",
+  "white-bag": "resource/images/photos/malta",
+  "beige-bag": "resource/images/photos/czechia",
+  "striped-mug": "resource/images/photos/friends_05",
+  "blue-mug": "resource/images/photos/friends_06",
+  "dark-cup": {
+    "folder": "resource/images/photos/friends_07",
+    "video_first_frame": true
+  },
+  "teacup": "resource/images/photos/family",
+  "small-jar": {
+    "folder": "resource/images/photos/china_13",
+    "video_first_frame": true
+  },
+  "hanging-left": {
+    "folder": "resource/images/photos/leuven_14",
+    "video_first_frame": true
+  },
+  "hanging-middle-left": "resource/images/photos/leuven_15",
+  "hanging-middle-right": "resource/images/photos/leuven_16",
+  "hanging-right": "resource/images/photos/netherlands_17"
+}

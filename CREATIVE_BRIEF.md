@@ -2,6 +2,117 @@
 
 ## Confirmed so far
 
+- Cabinet doors uses the supplied `IMG_5353.MOV` segment 00:11–00:22, exported
+  locally at 2x speed as `resource/video/cabinet-doors.mp4` (5.5 seconds, 30 fps).
+  Crop 15% from each horizontal side, keeping the middle 70% at 896 × 720.
+  Convert the source HLG HDR to SDR BT.709 and moderately boost brightness,
+  contrast, and saturation. Keep source unchanged outside the repository, ship
+  only the prepared MP4 and first-frame poster, without video audio. Preserve
+  pause/replay, reduced-motion poster/manual play, final frame, and the growing
+  localized card/form popup at completion. Cat animation remains unchanged.
+  On entering the video view, grow it from 40% to the full available image area
+  over 1.8 seconds with an eased fade-in, keeping the aspect ratio. Reduced
+  motion skips the growth and displays the video/poster at full size immediately.
+
+- Embed the Microsoft Forms RSVP questionnaire below both the Cabinet doors card
+  image and its accompanying text. Use the new sharing URL
+  `https://forms.cloud.microsoft/r/AEARxMLt2u` for English and
+  `https://forms.cloud.microsoft/r/cEPrTLnGeH` for both Chinese scripts, with
+  resolved response URLs and `embed=true` in the card's `form` field in
+  `scene-elements.js`. English uses `resource/images/props/card-en.jpeg`, copied
+  unchanged from the supplied WhatsApp JPEG; both Chinese scripts retain the
+  existing `card.jpeg`. Switching language updates the displayed card and form.
+  Guests fill it
+  inside the card popup. Translate the surrounding heading/frame title into all
+  three languages; Microsoft Forms controls the questionnaire itself. Load only
+  when the card opens and unload on close. Preserve the form between Traditional
+  and Simplified Chinese; switch forms only when moving to or from English.
+
+- Additional linked shelf folders: 03 `pitcher` → `metal_pitcher` (9 photos),
+  04 `dotted-mug` → `dotted_mug` (11), 09 `tin` → `festival` (14),
+  10 `canister` → `berlin` (8), 11 `white-bag` → `malta` (8), and
+  12 `beige-bag` → `czechia` (6). Change item 12's context from Italy to Czechia
+  in both languages, keeping 2025 as explicitly requested. The supplied split
+  Friends folders 05, 06, and 07 now map to `striped-mug`, `blue-mug`, and
+  `dark-cup`, using `friends_05`, `friends_06`, and `friends_07` respectively.
+  Each has 18 gallery images. For 07, show nine photos plus first-frame JPEGs
+  from nine MP4s, without video playback. Preserve all source files unchanged.
+  Further supplied collections: 08 `teacup` → `family` (11), 13 `small-jar` →
+  `china_13` (8), 14 `hanging-left` → `leuven_14` (11), 15 `hanging-middle-left`
+  → `leuven_15` (11), 16 `hanging-middle-right` → `leuven_16` (12), and
+  17 `hanging-right` → `netherlands_17` (10). Items 13 and 14 each include three
+  MP4 first-frame stills. There are 230 browser images in 20 active albums.
+  Keep only gallery-used images under `resource/images/photos/`; remove local
+  source copies, unused formats, and the earlier unlinked Friends copy. External
+  Downloads sources stay unchanged. Prepare directly from external folders/ZIPs
+  with `prepare-photo-albums.py --source ITEM_ID PATH`; retain existing generated
+  albums when no source is supplied.
+- The 17 photo-shelf items have separate bilingual JSON files at
+  `resource/text/photo_shelves/<item-id>/text.json`, using their stable IDs from
+  `shelf-interactions.js`. Preserve the user-supplied numbered titles, context,
+  emojis, Chinese wording, and English wording. Clicking a shelf item or its
+  keyboard button displays its title/context in the photo popup, even when an
+  album is not assigned yet. Put shelf-item context directly below the popup
+  title, with the photo grid using the full viewing width below the heading.
+  Language switching updates the open popup. Future
+  folder-based photos share the same popup and item ID. Keep the parent shelf
+  introduction in `resource/text/photo_shelves/text.json`.
+
+- Reduce the room/model/animation window to 75% of the previous width and
+  height, preserving its 4:3 ratio. Desktop width is
+  `min(75%, (viewport height - 120px) * 1.5)`. Phone layouts stay full width.
+  Use balanced model/text columns: fit each model's actual bounds within the
+  left half, centered near 31% width and 55% height, with clear heading space.
+  Center the reading panel vertically at 55%, starting at 61% width, up to 35%
+  wide and 52ch long. At 900px and below, center the model and stack text below.
+  Preserve ray picking, orbit/zoom, reset, model exposure, and language behavior.
+- Use a folder-based photo system: `photo-albums.json` maps each item's stable ID
+  to `resource/images/photos/<folder>/`. Keep browser JPEGs in `web/` and source
+  files outside the repository; generate `photo-albums.js` with
+  `scripts/prepare-photo-albums.py` using the supplied external source paths.
+  Current replacements: Cabinet top vase (`cabinet-vase`) uses `cabinet_top`
+  with 12 photos; Cabinet left's leftmost beer can (`cabinet-can`) uses `beer_can`
+  with 14 photos. Cabinet right's frame (`cabinet-photo-frame`) uses `photo_frame`
+  with 9 photos. Shelf 01 (`dripper`) uses `coffee_dripper` with 10 photos;
+  shelf 02 (`jar`) uses `white_storage_jar` with 12 photos. The three companion
+  MP4 clips are excluded from those albums. Additional replacements are listed
+  above; all 17 shelf items now have assigned albums.
+  Cabinet and shelf item galleries use this system, preserving interaction and
+  bilingual empty states. Legacy numbered mappings are reference only.
+
+- The user requested removal of the entire old photo collection under
+  `resource/images/photos/`, including original and generated browser images.
+  The first two replacement folders are supplied as described above; other
+  replacement photos and linking instructions will be supplied later.
+  Keep numbered mappings as a reference; the active runtime manifest is
+  `photo-albums.js`, generated from the new folder map.
+  Empty albums show an honest empty-state message in both languages and must
+  not break model loading, room progression, rewards, animations, or the card.
+
+- All 29 content files under `resource/text/` are `text.json`, with string
+  fields `title_en`, `title_ch`, `title_chs`, `context_en`, `context_ch`, and
+  `context_chs`. The `_chs` fields provide editable Simplified Chinese copy.
+  Use Traditional Chinese characters consistently in `_ch` and Simplified
+  Chinese characters consistently in `_chs`, with identical wording and meaning.
+  Preserve names, punctuation, emojis, and line breaks when correcting scripts.
+  Language buttons cycle Traditional Chinese → English → Simplified Chinese,
+  showing the next language's name; use `zh-Hant`, `en`, and `zh-Hans` for the
+  document language. Translate interface labels as well as source JSON. Preserve original
+  Chinese copy and provide English translations. Show the chosen language's
+  title and body on its existing page/popup. Chinese is the initial default;
+  guests can switch via the header or inside popups, with a locally saved choice.
+  Switching must preserve model/animation/music state and inventory. Image text
+  remains part of the supplied image and is not replaced.
+- Pegboard, Grinder, and Espresso machine now also have linked text sources:
+  `pegboard/text.json`, `grinder/text.json`, and `espresso_machine/text.json`.
+  Use the user-authored bilingual headings and body copy: Coffee of the Month
+  for Pegboard, Freshly Ground for Grinder, Our Morning Ritual for Espresso,
+  and Little Stories, One Mug at a Time for Photo shelves. Preserve the supplied
+  Chinese wording and English copy. Reopening reads edits through the bilingual loader.
+- Add a Free exploration button in the header. It reveals every room hotspot
+  and named entry, bypassing room order and bean requirements for reward buttons.
+  Do not award items automatically. Keep guided behavior until activated, and
+  reset exploration mode and inventory on refresh. Language preference persists.
 - This is a wedding invitation.
 - Page heading: “Invitation：佑琦 & 竹平” above “Explore our room”. Do not show the scene-number caption or “Interactive scene test” below the scene.
 - The invitation should feel like a small interactive game.
@@ -14,8 +125,8 @@
 - Do not show the room-header hover/click instruction, including when returning from a detail view.
 - Clicking the espresso machine should zoom toward it and display `resource/model/espresso.optimized.glb` in an interactive 3D view.
 - Keep the selected zoomed room image lightly blurred behind 3D models; models and controls remain sharp. The default is the cartoon version.
-- Frame all seven models to the left by 30% of their initial displayed width, leaving space on the right for future words. Preserve model size, rotation centers, glow, and object picking. Recompute framing on resize and reset. Use supplied text where available; other text remains TODO with no guest-facing placeholders.
-- Model text is stored under `resource/text/` and mapped by the `text` property in `scene-elements.js`. Photo shelves currently reads `resource/text/photo_shelves/text` (the supplied coffee-shelf and travel-memory copy). Show supplied plain text on the right, preserving paragraphs and line breaks; below the scene on narrow screens. Re-read on entry. Hide empty copy and hide the panel during image comparison or after returning. Cabinet top, Cabinet left, and Cabinet right are also mapped to `resource/text/cabinet_top/text`, `cabinet_left/text`, and `cabinet_right/text` respectively; empty files stay invisible. Coffee bean and mug text remains attached to their acquisition popups.
+- Frame all seven models in the balanced columns specified above. Recompute on entry, resize, and keyboard Home; preserve all surface click targets and text readability.
+- Model text is stored under `resource/text/` and mapped by the `text` property in `scene-elements.js`. Photo shelves currently reads `resource/text/photo_shelves/text.json` (the supplied coffee-shelf and travel-memory copy). Show supplied JSON title and context on the right, preserving paragraphs and line breaks; below the scene on narrow screens. Re-read on entry. Hide empty copy and hide the panel during image comparison or after returning. Cabinet top, Cabinet left, and Cabinet right are also mapped to `resource/text/cabinet_top/text.json`, `cabinet_left/text.json`, and `cabinet_right/text.json` respectively; empty files stay invisible. Coffee bean and mug text remains attached to their acquisition popups.
 - In model detail views, remove the rotation, zoom in/out, and reset-view buttons and all visible instruction text, including the page hint and shelf helper text. Keep drag/scroll and keyboard interaction, object names, and shelf photo buttons. Place Show room image / Show model at the top right where Back to room was, with Back to room directly below; use the same arrangement in room-image comparison mode.
 - In each 3D detail view, provide a toggle between the model and the zoomed background image. Image mode shows only the sharp zoomed real photograph (`whole_scene.jpg`); do not offer a cartoon image option. Preserve the model view while comparing; Back/Escape restores the cartoon main room.
 - Only the center front-panel espresso button is interactive. Keep its warm gold hover/focus glow and click selection, plus a single keyboard-accessible Center button below the viewer. The other four physical buttons remain part of the model with no hover or click targets. Clear hover on exit/dragging and respect occlusion. Clicking acquires the coffee mug described below.
@@ -23,27 +134,21 @@
 - Grinder is step 02, between Pegboard and Espresso machine. Use `resource/model/grinder/grinder.optimized.glb` at the original room grinder location with the shared model viewer. The bean unlocks Grinder; successful model entry unlocks Espresso machine. Failed/cancelled entry does not advance. The grinder button opens the coffee grounds reward; Espresso remains unlocked by visiting Grinder.
 - Pegboard marker 01 opens `resource/model/pegboard.optimized.glb`, with the same zoom, blurred room background, and 3D controls as the other models. The pegboard photo remains a reference.
 - Make the coffee bag on the pegboard a clickable object with warm gold surface glow and a Coffee bag hover label. Provide a matching keyboard-accessible button below the model. Clicking acquires the coffee bean described below. Keep rotation gestures separate from clicks and preserve picking through the left-shifted camera. The source GLB stays unchanged; calibration is in `pegboard-interactions.js`.
-- Marker 07 zooms into the cabinet doors, then cuts to the 11 timestamp-ordered images in `resource/images/opening_door/`, played at 6 fps. Play once, hold the open-door frame, and provide pause/replay. Reduced motion disables autoplay; Play remains available.
-- Beneath the cabinet reads `resource/text/beneath_the_cabinet/text` and displays the supplied copy below the cat animation window, preserving paragraphs and line breaks. Re-read on entry, hide empty copy, and clear it on leaving; playback and hover-to-pause remain unchanged.
+- Marker 07 zooms into the cabinet doors, then plays the prepared MP4 described above. Play once, hold the final frame, and provide pause/replay. Reduced motion disables autoplay; Play remains available.
+- Beneath the cabinet reads `resource/text/beneath_the_cabinet/text.json` and displays the supplied copy below the cat animation window, preserving paragraphs and line breaks. Re-read on entry, hide empty copy, and clear it on leaving; playback and hover-to-pause remain unchanged.
 - Marker 08 zooms beneath the cabinet, then cuts to the 13 images in `resource/images/cat/`, ordered numerically from `0.jpg` through `12.jpg`, at 2 fps, looping automatically. Pause while the pointer hovers over the image; resume on exit only if it was playing. Manual pause must stay paused. Preserve pause/replay, cancellation, and reduced-motion behavior.
 - Marker 04 opens `resource/model/display_shelf/top/cabinet-top.optimized.glb` with the shared zoom, blurred backdrop, 3D controls, and real room photo comparison. Its original photo stays as a reference.
-- Cabinet object albums: Cabinet top vase opens set 4 then set 24 (8 photos).
-  Cabinet left's leftmost beer can opens set 6, set 8, image 15-0, image 16-1,
-  set 18, set 20, set 21, set 23, set 25, set 28 (18 photos). Cabinet right's left
-  photo frame opens all of set 1 (7 photos). Preserve this ordering, glow,
-  keyboard access, drag-versus-click handling, irregular scrolling photo layout,
-  Close/Escape, and focus return. Other beer cans remain scenery. Preserve GLBs.
+- Cabinet object albums now come from the folder map: the Cabinet top vase uses
+  `cabinet-vase` (12 photos), and Cabinet left's leftmost beer can uses
+  `cabinet-can` (14 photos). Cabinet right's frame uses `cabinet-photo-frame`
+  (9 photos).
+  Keep existing glow, keyboard buttons, drag-versus-click, photo layout, closing,
+  and focus return. Other beer cans remain scenery; source GLBs stay unchanged.
 - Marker 09 opens `resource/model/shelf.optimized.glb`, with shared zoom, 3D controls, and real room photo comparison. Its original `shelf.jpg` remains a reference.
-- The 17 photo-shelf items keep their current left-to-right, top-to-bottom order.
-  Their albums combine source sets as follows: 1:[1], 2:[2,3], 3:[4], 4:[5,6,7],
-  5:[8,9], 6:[10,11], 7:[12,13], 8:[14,15], 9:[16,17], 10:[18,20],
-  11:[19,21], 12:[22], 13:[23], 14:[24,26], 15:[25], 16:[27], 17:[28].
-  Preserve listed set order and numeric photo order within each set. The source
-  collection contains 68 photos across 28 sets. Keep every photo, using local
-  JPEGs under photos/web/ and retaining originals. Larger albums scroll with
-  irregular photo cards; narrow screens stack them. Keep warm gold glow,
-  keyboard buttons, drag-versus-click, Close/Escape, and focus return. Source GLB
-  regions remain in shelf-interactions.js; grouped mappings are in shelf-albums.js.
+- The 17 photo-shelf items keep their current left-to-right, top-to-bottom order
+  and their stable IDs in `shelf-interactions.js`. Assigned shelf folders are listed above; other folders remain pending. Map folders by those IDs in `photo-albums.json`.
+  Keep empty states, full-photo layouts, glow, keyboard access, and Close/Escape.
+  Old numbered-set groupings remain in the legacy code only as a reference.
 - Cabinet top and Cabinet right use local optimized GLB copies, preserving their original Meshy files. Target roughly 400,000 and 250,000 triangles respectively, with 1024-pixel JPEG textures and Meshopt compression. Current outputs are 4.06 MB / 399,996 triangles and 2.69 MB / 249,994 triangles. Bundle the decoder locally; preserve appearance and interaction while accepting softer fine details. Rebuild using `scripts/optimize-cabinet-models.mjs`; exact statistics are in `resource/model/display_shelf/optimization-report.json`.
 - All seven models use tone-mapping exposure 0.819, reduced a further 30% from 1.17 (37% below the original 1.3).
 - Espresso, pegboard, photo shelves, grinder, and Cabinet left also use local
@@ -55,7 +160,7 @@
   `resource/model/optimization-report.json`.
 - The supplied model can be generated externally and downloaded; this prototype renders it locally.
 - The coffee cabinet, side-cabinet overview, and plant hotspots have been removed; the grinder is restored as a model step. Keep their source photos as references. Hide all numbered overlays on the room image; keep object glow and name annotations on hover or keyboard focus, and use the current sequential numbers in the named list.
-- Coffee acquisition flow: clicking the pegboard coffee bag shows `resource/images/props/Voxel cluster of roasted coffee beans.png` and the exact UTF-8 text from `resource/text/coffee_bean/text`, acquires one coffee bean, and unlocks Grinder. Successfully visiting Grinder then unlocks Espresso machine. Clicking its center button (requires the bean) shows `resource/images/props/Chunky voxel coffee mug.png` and `resource/text/coffee_mug/text`, acquires one coffee mug, and unlocks Cabinet top. Use an accessible modal with Close/Escape and focus return. Award only when both image and nonempty text have loaded; cancelled or failed loads do not award/unlock. Retry is available. Repeated clicks reopen the item without duplicate acquisition. Items remain collected for this page session.
+- Coffee acquisition flow: clicking the pegboard coffee bag shows `resource/images/props/Voxel cluster of roasted coffee beans.png` and the exact UTF-8 text from `resource/text/coffee_bean/text.json`, acquires one coffee bean, and unlocks Grinder. Successfully visiting Grinder then unlocks Espresso machine. Clicking its center button (requires the bean) shows `resource/images/props/Chunky voxel coffee mug.png` and `resource/text/coffee_mug/text.json`, acquires one coffee mug, and unlocks Cabinet top. Use an accessible modal with Close/Escape and focus return. Award only when both image and nonempty text have loaded; cancelled or failed loads do not award/unlock. Retry is available. Repeated clicks reopen the item without duplicate acquisition. Items remain collected for this page session.
 - Room list order and labels: 01 Pegboard, 02 Grinder, 03 Espresso machine, 04 Cabinet top, 05 Cabinet left, 06 Cabinet right, 07 Cabinet doors, 08 Beneath the cabinet, 09 Photo shelves. Do not show "3D" in guest-facing controls, labels, or loading messages; the comparison button reads Show model.
 - Reveal room elements sequentially in the listed order. Only Pegboard is available initially. Pegboard requires collecting the coffee bean to reveal Grinder; Grinder requires a successful detail-view visit to reveal Espresso machine; Espresso machine requires collecting the coffee mug to reveal Cabinet top. After Cabinet top, a successful detail-view entry reveals the next hotspot and named button; previously revealed elements stay available. Locked elements have no hover glow, label, click target, or keyboard/button entry. Failed or cancelled loads do not advance progress. Keep progress in memory for this page session; refresh restarts exploration. The 17 photo-shelf sub-items remain available together once Photo shelves is unlocked.
 - Identify the remaining nine objects on the room backdrop. Each first zooms in at its location, then opens its photo, animation, or assigned 3D model. Photo shelves, pegboard, grinder, espresso, cabinet top, and the left/right display areas use GLBs; markers 07 and 08 use animations.
@@ -94,11 +199,11 @@ List the planned scenes in order. Leave this section open until scene ideas are 
 - Cabinet right: the left photo frame opens set 1, with warm gold
   hover/focus/selection glow, Photo frame label, and matching keyboard button.
   Preserve drag-versus-click behavior and real-image comparison.
-- After Cabinet doors finishes its 6 fps animation, automatically open
+- After Cabinet doors finishes its 5.5-second video, automatically open
   `resource/images/props/card.jpeg` in an accessible image popup. Grow it from
   the center of the preceding door image over 700 ms, gently dimming the backdrop.
   Decode the card before revealing it; skip this motion for reduced motion.
-  Show `resource/text/cabinet_doors/text` to the right of the card, or below on
+  Show `resource/text/cabinet_doors/text.json` to the right of the card, or below on
   narrow screens. Re-read the UTF-8 copy each opening and preserve paragraphs.
   Empty or failed copy stays hidden without blocking the card. Close/Escape
   returns to the finished animation with focus restored. Replays show the card
@@ -106,11 +211,11 @@ List the planned scenes in order. Leave this section open until scene ideas are 
   waits for explicit playback. Keep the existing room progression.
 - Grinder: the small silver button at the lower-right side glows on hover/focus
   and opens `resource/images/props/Voxel coffee grounds mound.png` with UTF-8
-  text from `resource/text/coffee_ground/text`. Include a matching keyboard
+  text from `resource/text/coffee_ground/text.json`. Include a matching keyboard
   button, Close/Escape, and focus return. Re-read copy each time; while the file
   is empty, show the image alone without placeholder text. This popup collects
   coffee grounds; the existing visit-based Espresso unlock remains in place.
-- Clickable items and what each one does: photo shelves, cabinet top, pegboard, espresso machine, and the left/right display-shelf areas open their supplied 3D models after zoom transitions; markers 07 and 08 open the door (6 fps) and cat (2 fps, hover to pause) animations after their zooms.
+- Clickable items and what each one does: photo shelves, cabinet top, pegboard, espresso machine, and the left/right display-shelf areas open their supplied 3D models after zoom transitions; markers 07 and 08 open the cabinet video (5.5 seconds at 30 fps) and cat (2 fps, hover to pause) animations after their zooms.
 - Items guests can zoom in on: all nine mapped room areas, using their locations in the backdrop; the coffee cabinet, cabinet overview, plant, and full-shelf photo hotspots are removed.
 - How guests move between scenes: click an object hotspot or its named button to enter; Back to room or Escape returns (prototype controls).
 - Any choices or progress to remember:
@@ -124,7 +229,7 @@ This is the working direction for the current prototype, not a final wedding the
 - Typography: Georgia/serif headings with system sans-serif body text, labels, and controls; no downloaded fonts.
 - Illustration, photography, or other art direction: use `whole_scene_cartoon.png` for the main room, the original room photo for comparison, and supplied individual photos/models for details. Preserve the full 4:3 backdrop and show detail photos without cropping. The room is a flat image rather than a reconstructed 3D environment.
 - Controls: unnumbered room hotspots with glow and names on hover or keyboard focus, matching named buttons below the room, and rounded light panels/buttons with subtle shadows.
-- Animation and cutscene direction: approximately 1.1-second eased zoom toward the selected object's location, then cut to its photo or frame animation once loaded. Assigned models fade into their 3D view over the zoomed backdrop with a light `blur(2px)` CSS filter; models and controls stay sharp. Door animation uses 11 frames at 6 fps, plays once, and holds its final frame. Cat animation uses 13 frames at 2 fps and loops automatically, pausing on hover. Back/Escape returns to the room and cancels playback. Reduced motion skips transitions and animation autoplay; explicit Play/Replay is allowed. Story cutscenes remain TODO.
+- Animation and cutscene direction: approximately 1.1-second eased zoom toward the selected object's location, then cut to its photo or frame animation once loaded. Assigned models fade into their 3D view over the zoomed backdrop with a light `blur(2px)` CSS filter; models and controls stay sharp. The cabinet video uses the prepared 896 ? 720 MP4 at 30 fps for 5.5 seconds, plays once, and holds its final frame. Cat animation uses 13 frames at 2 fps and loops automatically, pausing on hover. Back/Escape returns to the room and cancels playback. Reduced motion skips transitions and animation autoplay; explicit Play/Replay is allowed. Story cutscenes remain TODO.
 - Music: play the supplied local MP3, Just the Two of Us by Joanna Wang, at
   30% initial volume. Start on the first click or Enter/Space interaction, loop,
   and keep native play/pause, seek, and volume controls below the room. Preserve
@@ -148,7 +253,7 @@ All paths below are relative to the project root. Keep runtime paths relative so
 | Default cartoon room | `resource/images/main_scene/whole_scene_cartoon.png` | Main 1448 × 1086 playground; default zoomed background behind 3D models |
 | Real room image | `resource/images/main_scene/whole_scene.jpg` | Original 4096 × 3072 room; selectable in image comparison mode and retained behind the model until returning to the room |
 | Individual object photos | `resource/images/main_scene/` | Reference photos for models and removed room hotspots |
-| Cabinet door animation originals | `resource/images/opening_door/IMG_20261018_154726.jpg` through `IMG_20261018_154815.jpg` (11 files, in timestamp order) | Source sequence for marker 07 at 6 fps |
+| Cabinet door animation originals | `resource/images/opening_door/IMG_20261018_154726.jpg` through `IMG_20261018_154815.jpg` (11 files, in timestamp order) | Earlier unused reference sequence; originals retained and ignored |
 | Cabinet door playback copies | `resource/images/opening_door/web/` | 900 × 1200 JPEG copies, preloaded and played at 6 fps; originals unchanged |
 | Earlier cabinet door photos | `resource/images/main_scene/side_cabinet_door_*.jpg` and `side_cabinet_low.jpg` | Reference assets; no longer used by marker 07 |
 | Cat animation originals | `resource/images/cat/0.jpg` through `12.jpg` | 13-frame sequence for marker 08, in numeric order, at 2 fps; hover to pause |

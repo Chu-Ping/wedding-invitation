@@ -11,9 +11,11 @@ __pycache__/
 /resource/model/display_shelf/top/Meshy_AI_Shelf_of_Memories_1018141613_texture.glb
 
 # Local image originals and references; keep browser-ready web/ copies.
+/resource/images/photos/*/originals/
 /resource/images/photos/*.[jJ][pP][gG]
 /resource/images/photos/*.[hH][eE][iI][cC]
 /resource/images/opening_door/*.[jJ][pP][gG]
+/resource/images/opening_door/web/
 /resource/images/cat/*.[jJ][pP][gG]
 /resource/model/**/*.[jJ][pP][gG]
 

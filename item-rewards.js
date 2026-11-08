@@ -1,18 +1,20 @@
+import { loadCopy, translatedCopy, onLanguageChange, setUIText, t } from './i18n.js?v=20261108-rsvp-embed';
+
 export const itemRewards = {
   coffeeBean: {
     id: 'coffee-bean', title: 'Coffee bean',
     image: 'resource/images/props/Voxel cluster of roasted coffee beans.png',
-    text: 'resource/text/coffee_bean/text',
+    text: 'resource/text/coffee_bean/text.json',
   },
   coffeeMug: {
     id: 'coffee-mug', title: 'Coffee mug',
     image: 'resource/images/props/Chunky voxel coffee mug.png',
-    text: 'resource/text/coffee_mug/text', requires: 'coffee-bean',
+    text: 'resource/text/coffee_mug/text.json', requires: 'coffee-bean',
   },
   coffeeGround: {
     id: 'coffee-ground', title: 'Coffee grounds',
     image: 'resource/images/props/Voxel coffee grounds mound.png',
-    text: 'resource/text/coffee_ground/text', requires: 'coffee-bean',
+    text: 'resource/text/coffee_ground/text.json', requires: 'coffee-bean',
     allowEmptyText: true,
   },
 };
@@ -27,36 +29,40 @@ export function createItemRewards(dialog, { onOpen, onClose, onAcquire }) {
   let request = 0;
   let returnFocus;
   let currentReward;
+  let copyData;
+  function render() {
+    const content = translatedCopy(copyData);
+    title.textContent = content.title || t(currentReward?.title ?? '');
+    image.alt = title.textContent;
+    text.textContent = content.context;
+    text.hidden = !content.context;
+  }
+  onLanguageChange(() => { if (dialog.open) render(); });
   async function load() {
     const thisRequest = ++request;
     const reward = currentReward;
     image.hidden = text.hidden = true;
     status.hidden = false;
-    status.textContent = 'Loading…';
+    setUIText(status, 'Loading…');
     retry.hidden = true;
     try {
       const pendingImage = new Image();
       pendingImage.src = reward.image;
       const [copy] = await Promise.all([
-        fetch(reward.text, { cache: 'no-cache' }).then(response => {
-          if (!response.ok) throw new Error(`Text request returned ${response.status}`);
-          return response.text();
-        }),
+        loadCopy(reward.text),
         pendingImage.decode(),
       ]);
       if (request !== thisRequest || !dialog.open) return;
-      const content = copy.replace(/^\uFEFF/, '').trim();
-      if (!content && !reward.allowEmptyText) throw new Error('Reward text is empty');
+      if (![copy.context_en, copy.context_ch, copy.context_chs].some(context => context.trim()) && !reward.allowEmptyText) throw new Error('Reward text is empty');
+      copyData = copy;
       image.src = pendingImage.src;
-      image.alt = reward.title;
-      text.textContent = content;
+      render();
       image.hidden = false;
-      text.hidden = !content;
       status.hidden = true;
       onAcquire(reward);
     } catch {
       if (request !== thisRequest || !dialog.open) return;
-      status.textContent = 'This item could not load. Try again.';
+      setUIText(status, 'This item could not load. Try again.');
       retry.hidden = false;
     }
   }
@@ -66,6 +72,7 @@ export function createItemRewards(dialog, { onOpen, onClose, onAcquire }) {
     ++request;
     image.removeAttribute('src');
     text.textContent = '';
+    copyData = null;
     onClose();
     if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
   });
@@ -73,9 +80,10 @@ export function createItemRewards(dialog, { onOpen, onClose, onAcquire }) {
     open(reward) {
       if (dialog.open) return;
       currentReward = reward;
+      copyData = null;
       returnFocus = document.activeElement;
       dialog.dataset.reward = reward.id;
-      title.textContent = reward.title;
+      title.textContent = t(reward.title);
       image.hidden = text.hidden = true;
       onOpen();
       dialog.showModal();

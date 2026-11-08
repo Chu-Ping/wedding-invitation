@@ -1,12 +1,39 @@
+import { getLanguage, loadCopy, translatedCopy, onLanguageChange, setUIText, setUIAttribute, t } from './i18n.js?v=20261108-rsvp-embed';
+
 export function createShelfGallery(dialog, { onOpen, onClose }) {
   const title = dialog.querySelector('h2');
   const photos = dialog.querySelector('.shelf-photo-spread');
   const content = dialog.querySelector('.shelf-gallery-content');
   const copy = dialog.querySelector('.shelf-gallery-copy');
   const closeButton = dialog.querySelector('[data-close-gallery]');
+  const footer = dialog.querySelector('[data-gallery-footer]');
+  const formFrame = dialog.querySelector('[data-gallery-form]');
+  setUIAttribute(formFrame, 'title', 'RSVP questionnaire');
   let returnFocus;
   let request = 0;
   let entrance;
+  let copyData;
+  let currentItem;
+  let currentIndex;
+  let refreshPhotos = [];
+  function updateForm() {
+    if (!dialog.open || !currentItem?.form) return;
+    const form = currentItem.form[getLanguage() === 'en' ? 'en' : 'ch'];
+    if (formFrame.getAttribute('src') !== form.embed) formFrame.src = form.embed;
+  }
+  function renderText() {
+    const localized = translatedCopy(copyData);
+    title.textContent = localized.title || (Number.isInteger(currentIndex)
+      ? `${String(currentIndex + 1).padStart(2, '0')} / ${t(currentItem?.label ?? '')}` : t(currentItem?.label ?? ''));
+    copy.textContent = localized.context;
+    copy.hidden = !localized.context;
+    content.dataset.hasCopy = String(Boolean(localized.context));
+  }
+  onLanguageChange(() => {
+    if (dialog.open) renderText();
+    refreshPhotos.forEach(refresh => { void refresh(); });
+    updateForm();
+  });
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) entrance?.cancel(); });
   function close() {
@@ -24,26 +51,40 @@ export function createShelfGallery(dialog, { onOpen, onClose }) {
     ++request;
     entrance?.cancel();
     photos.replaceChildren();
+    refreshPhotos = [];
+    currentItem = null;
     copy.textContent = '';
     copy.hidden = true;
     content.dataset.hasCopy = 'false';
+    copyData = null;
+    footer.hidden = true;
+    formFrame.removeAttribute('src');
     onClose();
     if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
   });
   return {
     async open(item, index, { origin } = {}) {
       const thisRequest = ++request;
+      refreshPhotos = [];
       const source = origin?.getBoundingClientRect();
       returnFocus = document.activeElement;
       const numberedSet = Number.isInteger(index);
-      title.textContent = numberedSet ? `${String(index + 1).padStart(2, '0')} / ${item.label}` : item.label;
+      footer.hidden = !item.form;
+      formFrame.removeAttribute('src');
+      dialog.dataset.layout = numberedSet ? 'shelf' : 'standard';
+      // Shelf context is a subtitle; card copy stays beside its image.
+      if (numberedSet) title.parentElement.append(copy);
+      else content.append(copy);
+      currentItem = item;
+      currentIndex = index;
+      copyData = null;
+      renderText();
       let set = item.photos;
       if (!set) {
         try {
           // Room startup does not depend on loading or validating photo albums.
-          const { shelfPhotoAlbums } = await import('./shelf-albums.js?v=20261018-albums-68');
-          set = shelfPhotoAlbums[index];
-          if (!set?.length) throw new Error('Photo album is empty');
+          const { photoAlbums } = await import('./photo-albums.js?v=20261108-complete-albums');
+          set = photoAlbums[item.id] ?? [];
         } catch {
           if (request !== thisRequest) return;
           photos.replaceChildren();
@@ -53,7 +94,7 @@ export function createShelfGallery(dialog, { onOpen, onClose }) {
           dialog.dataset.reveal = 'false';
           const message = document.createElement('p');
           message.className = 'photo-load-message';
-          message.textContent = 'These photos could not load. Refresh the page and try again.';
+          setUIText(message, 'These photos could not load. Refresh the page and try again.');
           message.setAttribute('role', 'status');
           photos.append(message);
           onOpen();
@@ -71,39 +112,56 @@ export function createShelfGallery(dialog, { onOpen, onClose }) {
       photos.dataset.count = set.length;
       photos.dataset.variant = numberedSet ? index % 3 : 0;
       photos.dataset.layout = set.length > 3 ? 'collection' : 'small';
+      if (!set.length) {
+        const message = document.createElement('p');
+        message.className = 'photo-load-message';
+        message.setAttribute('role', 'status');
+        setUIText(message, 'No photos have been added yet.');
+        photos.append(message);
+      }
       dialog.scrollTop = 0;
       const loads = set.map((photo, photoIndex) => {
         const card = document.createElement('figure');
         card.className = 'shelf-photo-card';
         const image = new Image(photo.width, photo.height);
-        image.alt = numberedSet ? `Photo ${photoIndex + 1} of ${set.length} in album ${index + 1}`
-          : `Photo ${photoIndex + 1} of ${set.length}: ${item.label}`;
+        setUIAttribute(image, 'alt', numberedSet ? 'Photo {number} of {count} in album {album}'
+          : 'Photo {number} of {count}: {name}',
+        { number: photoIndex + 1, count: set.length, album: index + 1, name: item.label });
         image.decoding = 'async';
         const message = document.createElement('p');
         message.className = 'photo-load-message';
-        message.textContent = 'Loading photo…';
+        setUIText(message, 'Loading photo…');
         message.setAttribute('role', 'status');
         const retry = document.createElement('button');
         retry.type = 'button';
-        retry.textContent = 'Retry photo';
+        setUIText(retry, 'Retry photo');
         retry.hidden = true;
+        let imageRequest = 0;
         const load = async () => {
+          const thisImage = ++imageRequest;
+          const localizedPhoto = photo.languages?.[getLanguage()] ?? photo;
           message.hidden = false;
-          message.textContent = 'Loading photo…';
+          setUIText(message, 'Loading photo…');
           image.hidden = true;
           retry.hidden = true;
-          image.src = photo.src;
+          image.width = localizedPhoto.width;
+          image.height = localizedPhoto.height;
+          image.src = localizedPhoto.src;
           try {
             await image.decode();
-            if (request !== thisRequest) return;
+            if (request !== thisRequest || imageRequest !== thisImage) return;
             image.hidden = false;
             message.hidden = true;
           } catch {
-            if (request !== thisRequest) return;
-            message.textContent = 'This photo could not load.';
+            if (request !== thisRequest || imageRequest !== thisImage) return;
+            setUIText(message, 'This photo could not load.');
             retry.hidden = false;
           }
         };
+        refreshPhotos.push(() => {
+          const localizedPhoto = photo.languages?.[getLanguage()] ?? photo;
+          if (image.getAttribute('src') !== localizedPhoto.src) return load();
+        });
         retry.addEventListener('click', load);
         card.append(image, message, retry);
         photos.append(card);
@@ -111,13 +169,10 @@ export function createShelfGallery(dialog, { onOpen, onClose }) {
       });
       if (item.text) loads.push((async () => {
         try {
-          const response = await fetch(item.text, { cache: 'no-cache' });
-          if (!response.ok) return;
-          const text = (await response.text()).replace(/^\uFEFF/, '').trim();
+          const data = await loadCopy(item.text);
           if (request !== thisRequest) return;
-          copy.textContent = text;
-          copy.hidden = !text;
-          content.dataset.hasCopy = String(Boolean(text));
+          copyData = data;
+          renderText();
         } catch {
           // Optional copy must not prevent the card from opening.
         }
@@ -128,6 +183,7 @@ export function createShelfGallery(dialog, { onOpen, onClose }) {
         onOpen();
         dialog.dataset.reveal = String(Boolean(source) && !reducedMotion.matches);
         dialog.showModal();
+        updateForm();
         closeButton.focus({ preventScroll: true });
         if (source && !reducedMotion.matches) {
           const target = dialog.getBoundingClientRect();

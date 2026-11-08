@@ -1,3 +1,5 @@
+import { setUIAttribute } from './i18n.js?v=20261108-rsvp-embed';
+
 // Frame playback uses elapsed time so timer drift does not change the requested fps.
 export async function createFrameAnimation(canvas, { frames, fps, labels, pauseOnHover = false, loop = false }, onState, onComplete = () => {}) {
   const images = await Promise.all(frames.map(async url => {
@@ -20,7 +22,7 @@ export async function createFrameAnimation(canvas, { frames, fps, labels, pauseO
     displayed = index;
     context.drawImage(images[index], 0, 0, canvas.width, canvas.height);
     canvas.dataset.frame = String(index);
-    canvas.setAttribute('aria-label', index === 0 ? labels.start : index === images.length - 1 ? labels.end : labels.during);
+    setUIAttribute(canvas, 'aria-label', index === 0 ? labels.start : index === images.length - 1 ? labels.end : labels.during);
   }
   function notify() { onState({ playing: playing || resumeOnLeave, ended: elapsed >= duration }); }
   function tick() {

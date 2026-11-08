@@ -1,6 +1,7 @@
-import { elements } from './scene-elements.js?v=20261018-optimized';
-import { createShelfGallery } from './shelf-gallery.js?v=20261018-start-fix';
-import { createItemRewards, itemRewards } from './item-rewards.js';
+import { elements } from './scene-elements.js?v=20261108-cabinet-video';
+import { createShelfGallery } from './shelf-gallery.js?v=20261108-localized-card';
+import { createItemRewards, itemRewards } from './item-rewards.js?v=20261108-rsvp-embed';
+import { loadCopy, renderCopy, onLanguageChange, initLanguageControls, setUIText, setUIAttribute } from './i18n.js?v=20261108-rsvp-embed';
 
 const stage = document.querySelector('#stage');
 const room = document.querySelector('#room');
@@ -40,8 +41,10 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const visitedElements = new Set();
 const acquiredItems = new Set();
 const roomControls = new Map();
+let freeExplore = false;
 
 function isElementUnlocked(element) {
+  if (freeExplore) return true;
   if (element.id === 'grinder') return acquiredItems.has('coffee-bean');
   if (element.id === 'espresso') return acquiredItems.has('coffee-bean') && visitedElements.has('grinder');
   if (element.id === 'cabinet-top') return acquiredItems.has('coffee-mug');
@@ -86,7 +89,7 @@ const rewardPopup = createItemRewards(rewardDialog, {
 });
 
 function openItemReward(reward) {
-  if (reward.requires && !acquiredItems.has(reward.requires)) return;
+  if (!freeExplore && reward.requires && !acquiredItems.has(reward.requires)) return;
   rewardPopup.open(reward);
 }
 
@@ -95,7 +98,7 @@ function setDetailMode(mode) {
   stage.dataset.detailMode = mode;
   canvasHost.hidden = imageMode;
   detailModeButton.disabled = false;
-  detailModeButton.textContent = imageMode ? 'Show model' : 'Show room image';
+  setUIText(detailModeButton, imageMode ? 'Show model' : 'Show room image');
   detailModeButton.setAttribute('aria-pressed', String(imageMode));
   viewer?.setActive(!imageMode && stage.dataset.state === 'model');
   shelfPanel.hidden = imageMode || stage.dataset.state !== 'model' || modelView.dataset.model !== 'shelf';
@@ -103,26 +106,29 @@ function setDetailMode(mode) {
   grinderPanel.hidden = imageMode || stage.dataset.state !== 'model' || modelView.dataset.model !== 'grinder';
   espressoPanel.hidden = imageMode || stage.dataset.state !== 'model' || modelView.dataset.model !== 'espresso';
   cabinetPanel.hidden = imageMode || stage.dataset.state !== 'model' || !['cabinet-top', 'display-left', 'display-right'].includes(modelView.dataset.model);
-  modelCopy.hidden = imageMode || stage.dataset.state !== 'model' || !modelText;
+  refreshCopy();
 }
+
+function refreshCopy() {
+  const hasModelCopy = renderCopy(modelCopy, modelText);
+  const hasAnimationCopy = renderCopy(animationCopy, animationText);
+  modelCopy.hidden = stage.dataset.state !== 'model' || stage.dataset.detailMode === 'image' || !hasModelCopy;
+  animationCopy.hidden = stage.dataset.state !== 'animation' || !hasAnimationCopy;
+}
+onLanguageChange(refreshCopy);
 
 async function loadElementText(element, thisSession) {
   if (!element.text) return;
   try {
     // Re-read on entry so editing the UTF-8 file requires no manifest rebuild.
-    const response = await fetch(element.text, { cache: 'no-cache' });
-    if (!response.ok) throw new Error(`Text request returned ${response.status}`);
-    const text = (await response.text()).replace(/^\uFEFF/, '').trim();
+    const text = await loadCopy(element.text);
     if (session !== thisSession) return;
     if (element.animation) {
       animationText = text;
-      animationCopy.textContent = text;
-      animationCopy.hidden = stage.dataset.state !== 'animation' || !text;
     } else {
       modelText = text;
-      modelCopy.textContent = text;
-      modelCopy.hidden = stage.dataset.state !== 'model' || stage.dataset.detailMode === 'image' || !text;
     }
+    refreshCopy();
   } catch (error) {
     // Optional copy must never prevent the model from opening.
     if (session === thisSession) console.warn(`Could not load text for ${element.label}:`, error);
@@ -132,9 +138,9 @@ async function loadElementText(element, thisSession) {
 function applyBackdrop(style) {
   backdrop.src = backdropSources[style];
   backdrop.dataset.style = style;
-  backdrop.alt = style === 'cartoon'
+  setUIAttribute(backdrop, 'alt', style === 'cartoon'
     ? 'A block-style cartoon room with coffee equipment, wall shelves, a side cabinet and a large plant.'
-    : 'A room photograph with coffee equipment, wall shelves, a side cabinet and a large plant.';
+    : 'A room photograph with coffee equipment, wall shelves, a side cabinet and a large plant.');
 }
 
 async function showRoomImage() {
@@ -170,24 +176,33 @@ elements.forEach((element, index) => {
   button.id = `${element.id}-hotspot`;
   button.type = 'button';
   button.className = 'hotspot';
-  button.setAttribute('aria-label', `${element.label}${element.animation ? ' animation' : ''}`);
+  setUIAttribute(button, 'aria-label', element.label);
   button.setAttribute('aria-controls', element.model ? 'model-view' : 'photo-view');
   const [left, top, width, height] = element.bounds;
   Object.assign(button.style, { left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%` });
   button.style.setProperty('--marker-x', `${element.marker[0]}%`);
   button.style.setProperty('--marker-y', `${element.marker[1]}%`);
   button.innerHTML = `<span class="hotspot-label" aria-hidden="true">${element.label}</span>`;
+  setUIText(button.querySelector('.hotspot-label'), element.label);
   button.addEventListener('click', () => openElement(element, button));
   hotspots.append(button);
   const listButton = document.createElement('button');
   listButton.type = 'button';
   listButton.dataset.element = element.id;
-  listButton.innerHTML = `<span class="object-number" aria-hidden="true">${number}</span>${element.label}`;
+  listButton.innerHTML = `<span class="object-number" aria-hidden="true">${number}</span><span></span>`;
+  setUIText(listButton.lastElementChild, element.label);
   listButton.setAttribute('aria-controls', element.model ? 'model-view' : 'photo-view');
   listButton.addEventListener('click', () => openElement(element, listButton));
   objectList.append(listButton);
   roomControls.set(element.id, [button, listButton]);
   button.hidden = listButton.hidden = !isElementUnlocked(element);
+});
+
+document.querySelector('#free-explore').addEventListener('click', event => {
+  freeExplore = true;
+  updateRoomAvailability();
+  event.currentTarget.setAttribute('aria-pressed', 'true');
+  setUIText(event.currentTarget, 'All items unlocked');
 });
 
 function openElement(element, source) {
@@ -204,15 +219,15 @@ function openElement(element, source) {
   photoView.hidden = true;
   backButton.focus({ preventScroll: true });
   photoZoomFinished = zoomRoom(element);
-  photoTitle.textContent = element.label;
-  hint.textContent = 'View the photo, then return to explore another object.';
+  setUIText(photoTitle, element.label);
+  setUIText(hint, 'View the photo, then return to explore another object.');
   hint.hidden = false;
   photoVariants.replaceChildren();
   photoVariants.hidden = element.photos.length < 2;
   element.photos.forEach(([file, label], index) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.textContent = label;
+    setUIText(button, label);
     button.addEventListener('click', () => showPhoto(element, index));
     photoVariants.append(button);
   });
@@ -233,16 +248,19 @@ async function openAnimation(element) {
   animationControls.hidden = true;
   backButton.hidden = false;
   backButton.focus({ preventScroll: true });
-  photoTitle.textContent = element.label;
+  setUIText(photoTitle, element.label);
   retryAction = () => openAnimation(element);
-  setStatus(`Loading ${element.label} animation…`);
+  setStatus('Loading {name} animation…', false, { name: element.label });
   const zoomFinished = zoomRoom(element);
   try {
     if (!animationPlayers.has(element.id)) {
-      const pending = import('./frame-animation.js').then(({ createFrameAnimation }) =>
-        createFrameAnimation(animationCanvas, element.animation, ({ playing, ended }) => {
+      const pending = (element.animation.video
+        ? import('./video-animation.js?v=20261108-cabinet-video').then(module => module.createVideoAnimation)
+        : import('./frame-animation.js?v=20261108-rsvp-embed').then(module => module.createFrameAnimation)).then(createAnimation =>
+        createAnimation(animationCanvas, element.animation, ({ playing, ended, error }) => {
           if (activeAnimationId !== element.id) return;
-          animationPlay.textContent = playing ? 'Pause' : ended ? 'Play again' : element.animation.playLabel;
+          setUIText(animationPlay, playing ? 'Pause' : ended ? 'Play again' : element.animation.playLabel);
+          if (error) setStatus('The animation could not load. Try again, or return to the room.', true);
         }, () => {
           if (activeAnimationId !== element.id || stage.dataset.state !== 'animation') return;
           if (element.animation.completionPhoto) shelfGallery.open(element.animation.completionPhoto, undefined, { origin: animationCanvas });
@@ -261,11 +279,11 @@ async function openAnimation(element) {
     animationControls.hidden = false;
     photoView.hidden = false;
     stage.dataset.state = 'animation';
-    animationCopy.hidden = !animationText;
+    refreshCopy();
     markElementVisited(element);
     animationPlayer.setHovered(animationCanvas.matches(':hover'));
     setStatus('');
-    hint.textContent = element.animation.hint;
+    setUIText(hint, element.animation.hint);
     hint.hidden = false;
     photoTitle.focus({ preventScroll: true });
     if (!reducedMotion.matches && !document.hidden) animationPlayer.play();
@@ -289,7 +307,7 @@ async function showPhoto(element, index) {
   const [file, label] = element.photos[index];
   retryAction = () => showPhoto(element, index);
   detailPhoto.hidden = true;
-  photoTitle.textContent = label;
+  setUIText(photoTitle, label);
   setStatus('Loading photo…');
   [...photoVariants.children].forEach((button, i) => button.setAttribute('aria-current', String(i === index)));
   try {
@@ -313,8 +331,8 @@ async function showPhoto(element, index) {
   }
 }
 
-function setStatus(message, canRetry = false) {
-  status.textContent = message;
+function setStatus(message, canRetry = false, values = {}) {
+  setUIText(status, message, values);
   statusPanel.hidden = !message;
   retryButton.hidden = !canRetry;
 }
@@ -346,10 +364,10 @@ async function createViewer() {
     import('three/addons/controls/OrbitControls.js'),
     import('three/addons/environments/RoomEnvironment.js'),
     import('./espresso-glow.js'),
-    import('./shelf-interactions.js'),
+    import('./shelf-interactions.js?v=20261108-shelf-copy'),
     import('./vendor/meshoptimizer/meshopt_decoder.js'),
     import('./pegboard-interactions.js'),
-    import('./cabinet-interactions.js?v=20261018-albums-68'),
+    import('./cabinet-interactions.js?v=20261108-complete-albums'),
     import('./grinder-interactions.js'),
   ]);
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -396,11 +414,11 @@ async function createViewer() {
     const mug = acquiredItems.has('coffee-mug');
     const grounds = acquiredItems.has('coffee-ground');
     grinderControl.setAttribute('aria-pressed', String(grounds));
-    grinderSelection.textContent = grounds ? 'Coffee grounds acquired' : '';
+    setUIText(grinderSelection, grounds ? 'Coffee grounds acquired' : '');
     coffeeBagButton.setAttribute('aria-pressed', String(beans));
     espressoButton.setAttribute('aria-pressed', String(mug));
-    pegboardSelection.textContent = beans ? 'Coffee bean acquired' : '';
-    espressoSelection.textContent = mug ? 'Coffee mug acquired' : '';
+    setUIText(pegboardSelection, beans ? 'Coffee bean acquired' : '');
+    setUIText(espressoSelection, mug ? 'Coffee mug acquired' : '');
   }
   function selectModelItem(id) {
     if (!active || !itemInteraction) return;
@@ -410,7 +428,7 @@ async function createViewer() {
       itemInteraction.select(id);
       cabinetButtons.querySelector('button').setAttribute('aria-pressed', 'true');
       render();
-      document.querySelector('#cabinet-selection').textContent = `Selected: ${cabinetItem.label}`;
+      setUIText(document.querySelector('#cabinet-selection'), 'Selected: {name}', { name: cabinetItem.label });
       if (cabinetItem.photos) shelfGallery.open(cabinetItem);
       return;
     }
@@ -463,7 +481,7 @@ async function createViewer() {
     shelfButtons.querySelectorAll('button').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.shelfItem === id));
     });
-    shelfSelection.textContent = `Selected: ${shelfItems.find(item => item.id === id).label}`;
+    setUIText(shelfSelection, 'Selected: {name}', { name: shelfItems.find(item => item.id === id).label });
     render();
     const index = shelfItems.findIndex(item => item.id === id);
     shelfGallery.open(shelfItems[index], index);
@@ -472,7 +490,7 @@ async function createViewer() {
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.shelfItem = item.id;
-    button.textContent = `${String(shelfItems.indexOf(item) + 1).padStart(2, '0')} / ${item.label}`;
+    setUIText(button, '{number} / {name}', { number: String(shelfItems.indexOf(item) + 1).padStart(2, '0'), name: item.label });
     button.setAttribute('aria-haspopup', 'dialog');
     button.setAttribute('aria-controls', 'shelf-gallery');
     button.setAttribute('aria-pressed', 'false');
@@ -500,7 +518,7 @@ async function createViewer() {
           renderer.domElement.dataset.objectHover = String(Boolean(id));
           const items = cabinetPhotoItems[element.id] ? [cabinetPhotoItems[element.id]]
             : element.id === 'pegboard' ? [coffeeBag] : element.id === 'grinder' ? [grinderButton] : element.id === 'espresso' ? [espressoCenterButton] : shelfItems;
-          renderer.domElement.title = items.find(item => item.id === id)?.label ?? '';
+          setUIAttribute(renderer.domElement, 'title', items.find(item => item.id === id)?.label ?? '');
         };
         const items = element.id === 'shelf' ? addShelfInteractions(object, onHover)
           : element.id === 'pegboard' ? addPegboardInteractions(object, onHover)
@@ -522,14 +540,14 @@ async function createViewer() {
     itemInteraction = selected.items;
     itemInteraction?.select(null);
     shelfButtons.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', 'false'));
-    shelfSelection.textContent = '';
+    setUIText(shelfSelection, '');
     cabinetButtons.replaceChildren();
-    document.querySelector('#cabinet-selection').textContent = '';
+    setUIText(document.querySelector('#cabinet-selection'), '');
     const cabinetItem = cabinetPhotoItems[element.id];
     if (cabinetItem) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.textContent = cabinetItem.label;
+      setUIText(button, cabinetItem.label);
       button.dataset.cabinetItem = cabinetItem.id;
       button.setAttribute('aria-pressed', 'false');
       if (cabinetItem.photos) {
@@ -543,7 +561,7 @@ async function createViewer() {
       button.addEventListener('focus', () => preview(cabinetItem.id));
       button.addEventListener('blur', () => preview(null));
       cabinetButtons.append(button);
-      cabinetPanel.setAttribute('aria-label', `${element.label} object buttons`);
+      setUIAttribute(cabinetPanel, 'aria-label', '{name} object buttons', { name: element.label });
     }
     refreshRewardControls();
     scene.add(model);
@@ -605,34 +623,57 @@ async function createViewer() {
   renderer.domElement.addEventListener('pointercancel', () => { press = null; dragging = false; pointer = null; if (active) render(); });
   document.addEventListener('visibilitychange', () => { pointer = null; if (active) render(); });
   controls.addEventListener('change', render);
+  const stackedModelLayout = matchMedia('(max-width: 900px)');
   function reset() {
     camera.clearViewOffset();
     const aspect = camera.aspect;
     const halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
-    const distance = 1.25 * Math.max(1 / Math.tan(halfFov), 1 / (Math.tan(halfFov) * aspect)) + 1;
-    controls.maxDistance = Math.max(9, distance * 1.5);
-    camera.position.set(.12, .13, 1).normalize().multiplyScalar(distance);
+    let distance = 1.25 * Math.max(1 / Math.tan(halfFov), 1 / (Math.tan(halfFov) * aspect)) + 1;
+    const stacked = stackedModelLayout.matches;
     controls.target.set(0, 0, 0);
-    controls.update();
-    camera.updateMatrixWorld(true);
-    if (framingBounds) {
-      // Shift the composition, keeping the orbit target and model coordinates intact.
-      // Raycaster uses this same projection, so object picking follows the shift.
+    const positionCamera = () => {
+      camera.position.set(.12, .13, 1).normalize().multiplyScalar(distance);
+      camera.lookAt(controls.target);
+      camera.updateMatrixWorld(true);
+    };
+    const projectedBounds = () => {
       let left = Infinity;
       let right = -Infinity;
+      let bottom = Infinity;
+      let top = -Infinity;
       for (const x of [framingBounds.min.x, framingBounds.max.x]) {
         for (const y of [framingBounds.min.y, framingBounds.max.y]) {
           for (const z of [framingBounds.min.z, framingBounds.max.z]) {
             const projected = new THREE.Vector3(x, y, z).project(camera);
             left = Math.min(left, projected.x);
             right = Math.max(right, projected.x);
+            bottom = Math.min(bottom, projected.y);
+            top = Math.max(top, projected.y);
           }
         }
       }
+      return { left, right, bottom, top };
+    };
+    positionCamera();
+    if (framingBounds) {
+      // Fit each model's actual bounds into its column, with space for headings
+      // and a consistent gap before the reading column. Mobile uses the center.
+      for (let pass = 0; pass < 3; pass++) {
+        const bounds = projectedBounds();
+        const fit = Math.max((bounds.right - bounds.left) / (2 * (stacked ? .86 : .50)),
+          (bounds.top - bounds.bottom) / (2 * .70));
+        distance = Math.max(controls.minDistance, distance * fit);
+        positionCamera();
+      }
+      const bounds = projectedBounds();
       const { width, height } = stage.getBoundingClientRect();
-      const modelWidth = (right - left) * width / 2;
-      camera.setViewOffset(width, height, modelWidth * .30, 0, width, height);
+      const centerX = (bounds.left + bounds.right) / 2;
+      const centerY = (bounds.bottom + bounds.top) / 2;
+      camera.setViewOffset(width, height, (.5 + centerX / 2 - (stacked ? .5 : .31)) * width,
+        (.5 - centerY / 2 - .55) * height, width, height);
     }
+    controls.maxDistance = Math.max(9, distance * 1.5);
+    controls.update();
     render();
   }
   function resize() {
@@ -644,6 +685,7 @@ async function createViewer() {
   }
   const observer = new ResizeObserver(resize);
   observer.observe(stage);
+  stackedModelLayout.addEventListener('change', resize);
   resize();
 
   function action(name) {
@@ -678,7 +720,7 @@ async function openModel(element) {
   modelText = '';
   modelCopy.textContent = '';
   modelCopy.hidden = true;
-  modelCopy.setAttribute('aria-label', `About ${element.label}`);
+  setUIAttribute(modelCopy, 'aria-label', 'About {name}', { name: element.label });
   modelCopy.scrollTop = 0;
   void loadElementText(element, thisSession);
   hint.hidden = true;
@@ -687,7 +729,7 @@ async function openModel(element) {
   retryAction = () => openModel(element);
   backButton.focus({ preventScroll: true });
   const zoomFinished = zoomRoom(element.id === 'espresso' ? undefined : element);
-  setStatus(`Loading ${element.label}…`);
+  setStatus('Loading {name}…', false, { name: element.label });
   try {
     if (!viewer) {
       loading ??= createViewer().catch(error => { loading = null; throw error; });
@@ -695,17 +737,17 @@ async function openModel(element) {
     }
     await viewer.prepareModel(element, event => {
       if (session !== thisSession || stage.dataset.state !== 'opening') return;
-      const progress = event.total ? ` ${Math.round(event.loaded / event.total * 100)}%` : '';
-      setStatus(`Loading ${element.label}…${progress}`);
+      setStatus(event.total ? 'Loading {name}… {percent}%' : 'Loading {name}…', false,
+        { name: element.label, percent: Math.round(event.loaded / event.total * 100) });
     });
     await zoomFinished;
     if (session !== thisSession) return;
     await viewer.selectModel(element);
     if (session !== thisSession) return;
-    document.querySelector('#model-title').textContent = element.label;
-    modelView.setAttribute('aria-label', `${element.label}`);
+    setUIText(document.querySelector('#model-title'), element.label);
+    setUIAttribute(modelView, 'aria-label', element.label);
     modelView.dataset.model = element.id;
-    canvasHost.setAttribute('aria-label', `${element.label}. Drag to rotate, scroll to zoom, or use the arrow keys, plus, minus, and Home.`);
+    setUIAttribute(canvasHost, 'aria-label', '{name}. Drag to rotate, scroll to zoom, or use the arrow keys, plus, minus, and Home.', { name: element.label });
     modelView.hidden = false;
     // Commit the starting opacity before fading in the 3D surface.
     modelView.getBoundingClientRect();
@@ -713,7 +755,7 @@ async function openModel(element) {
     markElementVisited(element);
     setDetailMode('model');
     setStatus('');
-    hint.textContent = '';
+    setUIText(hint, '');
     canvasHost.focus({ preventScroll: true });
   } catch (error) {
     console.error(`The ${element.label} viewer could not load:`, error);
@@ -748,7 +790,7 @@ function closeDetail() {
   setStatus('');
   room.inert = false;
   objectList.hidden = false;
-  hint.textContent = '';
+  setUIText(hint, '');
   returnFocus?.focus({ preventScroll: true });
 }
 
@@ -765,6 +807,9 @@ document.addEventListener('keydown', event => {
 document.querySelector('#backdrop').addEventListener('error', () => {
   setStatus('The room photo could not load. Check that the preview server is running from the project folder.');
 });
+setUIAttribute(backdrop, 'alt', backdrop.alt);
+initLanguageControls();
+
 if (location.protocol === 'file:') {
   setStatus('Open this prototype through the local preview server. See README.md for the command.');
 }

@@ -19,6 +19,35 @@
 
 ## Supplied assets
 
+- `resource/video/cabinet-doors.mp4` and its JPEG poster are prepared locally from
+  the user-supplied `IMG_5353.MOV`: source seconds 11–22, double speed, HDR-to-SDR
+  conversion, brightness/contrast/saturation adjustments, and a 15% crop from each
+  side. The original recording is unchanged and not bundled.
+
+- `resource/images/props/card-en.jpeg` is the user-supplied English invitation
+  card, copied without modification from the provided WhatsApp JPEG. The original
+  `resource/images/props/card.jpeg` remains the card for both Chinese scripts.
+
+- The `metal_pitcher`, `dotted_mug`, `festival`, `berlin`, `malta`, and `czechia`
+  folders under `resource/images/photos/` contain 56 additional user-supplied
+  still photos and three companion MP4 clips copied from the named ZIP archives.
+  JPEG playback copies are generated locally; originals and archives are unchanged.
+  The Friends ZIP was copied to `friends/originals/` but remains unlinked at the
+  user's request. All original-source folders are ignored by Git.
+
+- `resource/images/photos/coffee_dripper/`, `white_storage_jar/`, and
+  `photo_frame/`: 31 user-supplied photos copied unchanged into `originals/`
+  from their corresponding ZIP archives. Local browser JPEGs are in `web/`.
+  Source ZIPs remain unchanged in Downloads; source files stay ignored by Git.
+
+- `resource/images/photos/cabinet_top/originals/` and `beer_can/originals/`:
+  unchanged copies of the user-supplied Cabinet top and beer can ZIP contents.
+  There are 26 still photos and three companion MP4 clips. `web/` folders hold
+  locally converted JPEGs, up to 1600 pixels with orientation applied and EXIF
+  omitted. Only JPEG copies are displayed. Source archives remain in Downloads;
+  originals are ignored by Git. Existing Pillow/pillow-heif preparation tools
+  below are reused; no additional browser dependency is introduced.
+
 - `espresso.optimized.glb`, `pegboard.optimized.glb`, `shelf.optimized.glb`,
   `grinder/grinder.optimized.glb`, and
   `display_shelf/left/cabinet-left.optimized.glb` under `resource/model/`:
@@ -34,7 +63,9 @@
 
 - `resource/images/main_scene/*.jpg`: user-supplied room and element photographs.
 - `resource/images/main_scene/whole_scene_cartoon.png`: user-supplied cartoon room backdrop.
-- `resource/images/opening_door/IMG_*.jpg`: user-supplied door sequence. `opening_door/web/` contains resized JPEG playback copies; originals are unchanged.
+- `resource/images/opening_door/IMG_*.jpg`: earlier user-supplied door reference
+  sequence, now unused and ignored. Obsolete JPEG playback copies were removed;
+  source photos are unchanged.
 - `resource/images/cat/0.jpg` through `12.jpg`: user-supplied cat sequence. `cat/web/` contains resized JPEG playback copies; originals are unchanged.
 - `resource/model/espresso.glb`: user-supplied model, used without modification.
 - `resource/model/pegboard.glb`: user-supplied pegboard model, used without modification.
@@ -46,11 +77,25 @@
 - TODO before publishing: record the model's Meshy generation plan, applicable
   license, and any required attribution for each model. The GLB metadata does not specify a license.
 
+## Optional local video preparation
+
+- FFmpeg 9.0.2 (GPL-enabled build), https://ffmpeg.org/, used locally by
+  `scripts/prepare-cabinet-video.py`. No FFmpeg binary is shipped with the site.
+- imageio-ffmpeg 0.8.1 (BSD-2-Clause), https://github.com/imageio/imageio-ffmpeg,
+  supplies the local encoder used in this workspace. It is not a browser dependency.
+
+## Optional local Chinese copy audit
+
+Chinese copy was audited locally with opencc-python-reimplemented 0.1.7,
+Apache-2.0: https://github.com/yichen0831/opencc-python. It is an authoring tool
+only; no conversion library is shipped to or required by guests' browsers.
+
 ## Optional local photo preparation
 
 - Pillow 13.0.0, MIT-CMU: https://github.com/python-pillow/Pillow
 - pillow-heif 1.8.1, BSD-3-Clause: https://github.com/bigcat88/pillow_heif
-- Used locally by `scripts/prepare-shelf-photos.py` to prepare the supplied HEIC/JPEG photos. These tools are not bundled into or required by the browser experience. pillow-heif's native decoding dependencies and their notices are listed in its distribution's `LICENSES_bundled.txt`.
+- OpenCV 4.8.1, Apache-2.0: https://github.com/opencv/opencv/blob/4.8.1/LICENSE
+- Used locally by `scripts/prepare-photo-albums.py` (and the earlier `prepare-shelf-photos.py`) to prepare supplied photos. OpenCV is optional, used only to extract the first decoded MP4 frame for albums enabling `video_first_frame`. These tools are not bundled into or required by the browser experience. pillow-heif's native decoding dependencies and their notices are listed in its distribution's `LICENSES_bundled.txt`.
 
 ## Meshoptimizer 1.0.1
 

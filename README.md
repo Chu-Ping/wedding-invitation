@@ -6,6 +6,107 @@ A browser-based wedding invitation designed as a small interactive experience. G
 
 ## Project status
 
+The Cabinet doors card popup embeds the Microsoft Forms RSVP questionnaire below
+the card image and its adjacent text. Guests complete it inside the invitation.
+English uses `resource/images/props/card-en.jpeg`, copied unchanged from the
+supplied WhatsApp image, and form `https://forms.cloud.microsoft/r/AEARxMLt2u`.
+Traditional and Simplified Chinese both use the original `card.jpeg` and form
+`https://forms.cloud.microsoft/r/cEPrTLnGeH`. Language switching updates the card
+and embedded form immediately. The localized photo and resolved `embed=true`
+form URLs are configured in `scene-elements.js`. The surrounding heading and
+frame title follow all three languages. Questions, permissions, and response
+notifications are managed in Microsoft Forms. The frame loads when the card opens
+and unloads when it closes; other photo galleries do not load it.
+Verified in Chrome: the live questionnaire renders its name and attendance
+questions inside the card popup on desktop and on a fresh 390px-wide mobile
+load. The mobile frame uses the popup's full inner width to avoid Microsoft's
+narrow-frame link fallback. Switching between the two Chinese scripts preserves
+the loaded form. Switching between English and Chinese loads a different form,
+so any unsubmitted answers in the previous form are reset. No test response was submitted.
+Both live language-specific questionnaires, the copied English card, initial
+English opening, rapid language switches, and unchanged photo galleries were
+verified in Chrome. The English card matches the supplied file byte for byte.
+
+The old numbered photo collection has been removed. Replacement albums now use
+one dedicated folder per item, mapped in `photo-albums.json`:
+
+| Item button | Album folder | Photos |
+| --- | --- | --- |
+| Cabinet top vase (`cabinet-vase`) | `resource/images/photos/cabinet_top/` | 12 |
+| Cabinet left beer can (`cabinet-can`) | `resource/images/photos/beer_can/` | 14 |
+| Cabinet right frame (`cabinet-photo-frame`) | `resource/images/photos/photo_frame/` | 9 |
+| Shelf 01 Coffee Dripper (`dripper`) | `resource/images/photos/coffee_dripper/` | 10 |
+| Shelf 02 White Storage Jar (`jar`) | `resource/images/photos/white_storage_jar/` | 12 |
+| Shelf 03 Metal Pitcher (`pitcher`) | `resource/images/photos/metal_pitcher/` | 9 |
+| Shelf 04 Dotted Mug (`dotted-mug`) | `resource/images/photos/dotted_mug/` | 11 |
+| Shelf 05 Green Striped Mug (`striped-mug`) | `resource/images/photos/friends_05/` | 18 |
+| Shelf 06 Blue Mug (`blue-mug`) | `resource/images/photos/friends_06/` | 18 |
+| Shelf 07 Dark Cup and Saucer (`dark-cup`) | `resource/images/photos/friends_07/` | 18 |
+| Shelf 08 Patterned Teacup and Saucer (`teacup`) | `resource/images/photos/family/` | 11 |
+| Shelf 09 Tall Illustrated Tin (`tin`) | `resource/images/photos/festival/` | 14 |
+| Shelf 10 Square Canister (`canister`) | `resource/images/photos/berlin/` | 8 |
+| Shelf 11 White Coffee Bag (`white-bag`) | `resource/images/photos/malta/` | 8 |
+| Shelf 12 Beige Coffee Bag (`beige-bag`) | `resource/images/photos/czechia/` | 6 |
+| Shelf 13 Small Clear Jar (`small-jar`) | `resource/images/photos/china_13/` | 8 |
+| Shelf 14 Hanging Cup 1 (`hanging-left`) | `resource/images/photos/leuven_14/` | 11 |
+| Shelf 15 Hanging Cup 2 (`hanging-middle-left`) | `resource/images/photos/leuven_15/` | 11 |
+| Shelf 16 Hanging Cup 3 (`hanging-middle-right`) | `resource/images/photos/leuven_16/` | 12 |
+| Shelf 17 Hanging Cup 4 (`hanging-right`) | `resource/images/photos/netherlands_17/` | 10 |
+
+Each album keeps only the used `web/` JPEGs in the repository (up to 1600 pixels,
+orientation applied, EXIF omitted). Unused source copies, unsupported formats,
+and the old unlinked Friends collection have been removed from the photo directory.
+Sources in Downloads remain unchanged. Items 07, 13, and 14 include MP4 first-frame
+stills (nine, three, and three respectively); videos do not play in the galleries.
+Other albums exclude companion videos unless explicitly enabled. Browser copies
+and the generated `photo-albums.js` must be committed for publishing.
+Unassigned items show the bilingual empty-album message. Models, rewards,
+animations, the card, and language switching keep their existing behavior.
+
+To add or replace an item's photos:
+
+1. Keep source photos in a folder or ZIP outside the repository, such as Downloads.
+2. Map the item's stable ID to that folder in `photo-albums.json`.
+3. With Python, Pillow, and pillow-heif installed, run
+   `python scripts/prepare-photo-albums.py --source ITEM_ID "PATH_TO_FOLDER_OR_ZIP"`
+   from the project root. Repeat `--source ITEM_ID PATH` for multiple albums.
+4. Refresh the preview. Photos appear in natural filename order. Generated web
+   copies do not carry source EXIF metadata; source files are unchanged.
+
+Albums without a supplied source retain their existing generated images after
+path validation. A plain `python scripts/prepare-photo-albums.py` validates and
+reuses all current galleries. To regenerate an album, provide its source again.
+Legacy `originals/` folders are still supported if present, but are not required.
+
+To include MP4 first-frame stills, install OpenCV (`opencv-python`) locally and
+use an object instead of a folder string for that album, for example:
+`"dark-cup": {"folder": "resource/images/photos/friends_07", "video_first_frame": true}`.
+Extracted JPEGs end in `-first-frame.jpg`, keeping photos with the same stem distinct.
+
+The preparer writes `photo-albums.js`, shared by cabinet and shelf item buttons.
+Use `cabinet-photo-frame` for the Cabinet right frame; shelf item IDs are listed
+in `shelf-interactions.js` (for example `dripper` or `blue-mug`). Items absent from
+the folder map stay empty. No directory listing server, service, or build is
+needed for guests; this script is only an authoring step when photos change.
+
+There are now 230 gallery images in twenty item albums: all 17 shelf items and
+three cabinet item buttons. Friends folders 05, 06, and 07 have 18 images each.
+Item 12's bilingual context now says Czechia Trip, retaining the year 2025.
+
+Verified in Chrome: the actual
+model surfaces open the matching albums, including the new dripper (10), jar
+(12), and frame (9). Shelf titles/context match both JSON languages. Keyboard
+controls, narrow layouts, and Close/focus return work without failed assets or
+uncaught exceptions. The six newest albums were also checked for exact image
+lists, bilingual copy, full-width photo layout, keyboard focus, and narrow-screen
+overflow. Friends items 05–07 were checked through their actual model surfaces:
+18 images each, matching bilingual copy, correct first-frame stills for all nine
+MP4s, close/focus return, and narrow-screen overflow. The final six albums were
+checked through their model surfaces in all three languages; all 17 shelf
+galleries were checked again after cleanup. The photo directory contains exactly
+230 used JPEGs; 227 unused source/duplicate files (about 493 MiB) were removed.
+All six new MP4 stills match their first decoded frames.
+
 **09 / Photo shelves** opens `resource/model/shelf.optimized.glb` with the shared zoom,
 3D controls, exposure, and real room photo comparison. `shelf.jpg` is retained
 as a reference photo.
@@ -21,47 +122,12 @@ white borders. Only one set is shown at a time; Close photos, Escape, or a click
 outside the popup returns to the shelf and restores focus. The shelf view is
 preserved. Small screens stack the cards with the same casual arrangement.
 
-The 68 source photos are in `resource/images/photos/`, numbered in sets **1-28**.
-The 17 shelf buttons map to albums left to right, top to bottom, using
-`shelf-albums.js`. Sets are combined in the order below; each set's photos stay
-in numeric filename order. Cabinet albums have their own mappings. Larger
-albums use a scrolling, irregular grid; narrow screens stack the photos.
-`shelf-photos.js` lists local browser JPEGs up to 1600 pixels, with orientation
-applied and EXIF omitted, in `resource/images/photos/web/`. Originals remain.
-Only the selected album loads, with retry for individual failed images.
-Albums containing exactly four photos use one row of four on desktop. Narrow
-screens stack the photos for readability; other album layouts stay unchanged.
-
-| Shelf item | Source sets |
-| --- | --- |
-| 1 | 1 |
-| 2 | 2, 3 |
-| 3 | 4 |
-| 4 | 5, 6, 7 |
-| 5 | 8, 9 |
-| 6 | 10, 11 |
-| 7 | 12, 13 |
-| 8 | 14, 15 |
-| 9 | 16, 17 |
-| 10 | 18, 20 |
-| 11 | 19, 21 |
-| 12 | 22 |
-| 13 | 23 |
-| 14 | 24, 26 |
-| 15 | 25 |
-| 16 | 27 |
-| 17 | 28 |
-
-Verified in Chrome: all 17 albums match the requested set order and photo
-filenames, covering all 68 photos. Vase (8), can (18), and frame (7) albums retain
-their mappings. Keyboard opening, Escape/focus return, and narrow scrolling
-layouts passed without uncaught JavaScript errors.
-
-To rebuild after adding or renaming source photos, install optional Python
-packages `Pillow` and `pillow-heif`, then run
-`python scripts/prepare-shelf-photos.py` from the project root. This also removes
-obsolete generated JPEG copies. These packages are only for asset preparation;
-previewing and publishing still need no build step or Python packages.
+The legacy numbered-set mapping (`shelf-photos.js`, `shelf-albums.js`, and
+`scripts/prepare-shelf-photos.py`) is retained only as an old reference. Runtime
+photo galleries now use `photo-albums.json` and its generated `photo-albums.js`.
+The folder preparer supports JPEG, HEIC/HEIF, PNG, and WebP source photos and
+keeps full photos inside the existing irregular scrolling layout. Albums with
+exactly four photos use one row on desktop; narrow screens stack them.
 
 The GLB contains one fused mesh. `shelf-interactions.js` defines calibrated
 local-space regions and extracts surface overlays for the glow; the supplied GLB
@@ -88,16 +154,16 @@ Reward assets are defined in `item-rewards.js`:
 
 | Collected item | Image | Text | Unlocks |
 | --- | --- | --- | --- |
-| Coffee bean | `resource/images/props/Voxel cluster of roasted coffee beans.png` | `resource/text/coffee_bean/text` | Grinder |
-| Coffee grounds | `resource/images/props/Voxel coffee grounds mound.png` | `resource/text/coffee_ground/text` | No additional progression gate |
-| Coffee mug | `resource/images/props/Chunky voxel coffee mug.png` | `resource/text/coffee_mug/text` | Cabinet top |
+| Coffee bean | `resource/images/props/Voxel cluster of roasted coffee beans.png` | `resource/text/coffee_bean/text.json` | Grinder |
+| Coffee grounds | `resource/images/props/Voxel coffee grounds mound.png` | `resource/text/coffee_ground/text.json` | No additional progression gate |
+| Coffee mug | `resource/images/props/Chunky voxel coffee mug.png` | `resource/text/coffee_mug/text.json` | Cabinet top |
 
 The coffee mug requires the collected bean. Each acquisition uses a keyboard-
 accessible popup with the original image and UTF-8 copy, preserved line breaks,
 Close/Escape, and focus return. The model pauses while the popup is open.
-An item is awarded only after its image and text load successfully. Bean and mug
-copy must be nonempty. Coffee grounds allows an empty text file while its copy
-is being written; the image is centered and the empty copy is hidden.
+An item is awarded only after its image and valid bilingual JSON load successfully.
+Bean and mug context must be nonempty in at least one language. Coffee grounds
+allows blank context fields while its copy is being written; empty copy stays hidden.
 Failure offers retry; closing during loading cancels the award. Reopening an
 already-collected item shows it again without duplicating inventory or advancing
 extra steps. The rest of the room's sequence stays unchanged.
@@ -133,7 +199,7 @@ Collecting the bean reveals Grinder; successfully opening it reveals Espresso
 machine. A failed or cancelled Grinder load does not advance the sequence.
 
 The small silver button at the grinder's lower-right side opens the coffee grounds
-image and `resource/text/coffee_ground/text`. Hover or keyboard focus gives it a
+image and `resource/text/coffee_ground/text.json`. Hover or keyboard focus gives it a
 warm gold glow; the matching Grinder button below the viewer supports keyboard
 activation. Text is re-read whenever the popup opens, preserving paragraphs.
 Close/Escape returns to the model and restores focus. `grinder-interactions.js`
@@ -155,61 +221,127 @@ interaction helper.
 the same zoom, 3D controls, exposure, and real room photo comparison. Its former
 detail photo, `side_cabinet_top.jpg`, remains a reference asset.
 
-The cabinet object buttons open these albums in the listed order:
+The Cabinet top vase opens the `cabinet-vase` folder album; only Cabinet left's
+leftmost beer can opens `cabinet-can`. The other three beer cans remain scenery.
+The Cabinet right frame (`cabinet-photo-frame`) opens its `photo_frame` album.
+These objects retain their warm hover/focus/selection glow and keyboard buttons.
+Regions are calibrated in `cabinet-interactions.js`; source GLBs are unchanged.
 
-| Object | Album contents | Photos |
-| --- | --- | --- |
-| Cabinet top vase | Set 4, set 24 | 8 |
-| Cabinet left's leftmost beer can | Set 6, set 8, `15-0`, `16-1`, set 18, set 20, set 21, set 23, set 25, set 28 | 18 |
-| Cabinet right's left photo frame | Set 1 | 7 |
+All seven models are fitted into a consistent left column, using their actual
+projected bounds to leave a clear gap before the text. The model and text centers
+align at 55% of the scene height, leaving room for headings and top-right controls.
+The reading panel begins at 61% of scene width, uses up to 35% of the scene
+(maximum 52ch), and keeps long copy scrollable. At 900 pixels and below, text
+moves beneath the scene and the model is centered instead. Resize and keyboard
+Home recompute framing; mouse picking uses the same camera projection.
 
-Each set includes every currently supplied photo in numeric filename order.
-The other three beer cans remain scenery. These objects have warm hover/focus
-and selection glow, matching keyboard buttons below their models, and the same
-irregular photo cards with scrolling for larger albums. Narrow screens use one
-column. Close/Escape restores model interaction and keyboard focus. Regions and
-album mappings are in `cabinet-interactions.js`; source GLBs are unchanged.
-The 17 shelf buttons use the grouped album mapping above, including newly added
-photos in those source sets.
+### Languages and free exploration
 
-All seven models are framed to the left, shifted by 30% of their initial displayed
-width to leave space on the right for future text. The camera projection applies
-the shift, preserving orbit centers and ray-based object picking. The framing is
-recomputed on entry, resize, and keyboard Home. Model text comes from the matching
-file under `resource/text/` when supplied.
+Every file in `resource/text/<folder>/` is `text.json`, with six UTF-8 string
+fields: `title_en`, `title_ch`, `title_chs`, `context_en`, `context_ch`, and
+`context_chs`. The new `_chs` fields contain Simplified Chinese, initialized
+from the existing Chinese copy and editable independently.
+Traditional Chinese characters are used in `title_ch` and `context_ch`, and
+Simplified Chinese characters in `title_chs` and `context_chs`. Both Chinese
+versions retain the same wording and meaning; only character forms differ. English
+translations are provided in `context_en`. Titles are the corresponding object
+or page names. Names use the English spellings on the supplied invitation card.
+Use JSON string escapes such as `\n\n` for paragraph breaks. Content is rendered
+literally, without HTML. Edit these files directly; reopening the corresponding
+page/popup fetches fresh JSON without rebuilding any manifest.
 
-Model copy is authored as UTF-8 plain text. Photo shelves reads
-`resource/text/photo_shelves/text` each time it opens, preserving paragraphs and
-line breaks. The supplied copy about collected coffee beans, cups, and travel
-memories appears on the right. Save edits there, then reopen Photo shelves (or
-refresh the page) to display them.
-On narrow screens, copy flows below the scene for readability. The copy is hidden
-in room-image comparison and on return; photo popup behavior remains available.
-Empty, missing, or failed text never blocks model loading or shows placeholders.
+The existing Chinese option is the default. The language button cycles through
+Traditional Chinese → English → Simplified Chinese → Traditional Chinese,
+showing the name of the next language. It changes interface
+labels, JSON titles, and body copy immediately without restarting the current
+model, animation, music, or popup. The same toggle is inside reward and photo
+popups, where native modal focus keeps the header inaccessible. The selected
+language is saved locally for the next visit. Native browser audio controls use
+browser/system language. Image contents, including the printed card, are unchanged.
 
-All current text files are mapped:
+Verified in Chrome: all 29 source files display the matching title/context in
+all three languages across model views, the 17 shelf-item popups, rewards, cat
+text, and card text. All language buttons stay synchronized; switching preserves
+the animation frame, and Simplified Chinese remains selected after reloading.
+All 116 Chinese title/context fields and both sets of interface labels have
+also been reviewed for mixed scripts, preserving wording, punctuation, and line breaks.
 
-| Text file under `resource/text/` | Destination |
+The header's **Free exploration / 自由探索** button reveals all nine room
+hotspots and menu entries for this page session. Guests can open any model or
+animation and use its object buttons; bean prerequisites for espresso and grinder
+rewards are bypassed. It does not award items automatically or erase visits.
+The default guided sequence remains unchanged until this button is activated.
+Refreshing returns to the guided sequence while preserving the language choice.
+
+| JSON file under `resource/text/` | Destination |
 | --- | --- |
-| `cabinet_top/text` | Cabinet top (empty files stay hidden) |
-| `cabinet_left/text` | Cabinet left |
-| `cabinet_right/text` | Cabinet right |
-| `photo_shelves/text` | Photo shelves |
-| `beneath_the_cabinet/text` | Below the cat animation |
-| `cabinet_doors/text` | To the right of the card popup (below on narrow screens) |
-| `coffee_bean/text` | Coffee bean reward popup |
-| `coffee_ground/text` | Coffee grounds reward popup (empty copy stays hidden) |
-| `coffee_mug/text` | Coffee mug reward popup |
+| `pegboard/text.json` | Pegboard model: Coffee of the Month |
+| `grinder/text.json` | Grinder model: Freshly Ground |
+| `espresso_machine/text.json` | Espresso model: Our Morning Ritual |
+| `cabinet_top/text.json` | Cabinet top model |
+| `cabinet_left/text.json` | Cabinet left model |
+| `cabinet_right/text.json` | Cabinet right model |
+| `photo_shelves/text.json` | Photo shelves model: Little Stories, One Mug at a Time |
+| `photo_shelves/<item-id>/text.json` | Each of the 17 shelf-item photo popups |
+| `beneath_the_cabinet/text.json` | Below the cat animation |
+| `cabinet_doors/text.json` | Card popup title and copy |
+| `coffee_bean/text.json` | Coffee bean reward popup |
+| `coffee_ground/text.json` | Coffee grounds reward popup |
+| `coffee_mug/text.json` | Coffee mug reward popup |
 
-The cat page reads `resource/text/beneath_the_cabinet/text` on entry and places
+Each shelf item has its own editable JSON file under
+`resource/text/photo_shelves/<item-id>/text.json`. Its authored numbered title
+appears once in the popup heading; its context sits immediately below the title.
+The photo grid spans the full popup content width without a side text column.
+Both update when the language is switched, including
+while the popup is open. Text is also shown for items whose photos are pending.
+The parent `photo_shelves/text.json` remains the main model-page introduction.
+
+| Item | Folder ID | English heading |
+| --- | --- | --- |
+| 1 | `dripper` | Coffee Dripper ☕ |
+| 2 | `jar` | White Storage Jar |
+| 3 | `pitcher` | Metal Pitcher |
+| 4 | `dotted-mug` | Dotted Mug |
+| 5 | `striped-mug` | Green Striped Mug |
+| 6 | `blue-mug` | Blue Mug |
+| 7 | `dark-cup` | Dark Cup and Saucer |
+| 8 | `teacup` | Patterned Teacup and Saucer |
+| 9 | `tin` | Tall Illustrated Tin |
+| 10 | `canister` | Square Canister |
+| 11 | `white-bag` | White Coffee Bag |
+| 12 | `beige-bag` | Beige Coffee Bag |
+| 13 | `small-jar` | Small Clear Jar |
+| 14 | `hanging-left` | Hanging Cup 1 |
+| 15 | `hanging-middle-left` | Hanging Cup 2 |
+| 16 | `hanging-middle-right` | Hanging Cup 3 |
+| 17 | `hanging-right` | Hanging Cup 4 |
+
+Model and animation copy display their selected title and context, preserving
+line breaks. On narrow screens, copy flows below the scene. Model copy is hidden
+in room-image comparison. Empty or failed optional JSON never blocks model,
+animation, or card loading. Reward JSON must have all four string fields; beans
+and mug require some nonempty context before acquisition. Missing or malformed
+reward JSON offers retry and never awards the item. Changing language does not
+repeat acquisition or change inventory. `i18n.js` handles loading, rendering,
+interface labels, and language selection without third-party dependencies.
+
+Verified in Chrome: all nine JSON title/body mappings in both languages, switches
+inside open model/reward/card views, preserved cat animation frame, language
+persistence, default guided progression, Free exploration via keyboard, espresso
+reward without beans in free mode, invalid/cancelled JSON acquisition safety,
+all 17 grouped shelf albums, all cabinet albums, four-photo rows, and narrow
+header/model/popup layouts. No uncaught JavaScript exceptions were observed.
+
+The cat page reads `resource/text/beneath_the_cabinet/text.json` on entry and places
 its copy below the animation window and playback controls. It preserves UTF-8
 characters and line breaks and hides the copy on return or when another view
 opens. Empty or failed text does not block animation playback.
 
-For another model, add its copy under `resource/text/<folder>/text` and add a
+For another model, add its bilingual copy under `resource/text/<folder>/text.json` and add a
 `text` property with that relative path to the corresponding entry in
 `scene-elements.js`. This explicit mapping keeps text attached to the intended
-model, independent of list order. Text files are rendered literally, without HTML.
+model, independent of list order. JSON strings are rendered literally, without HTML.
 
 Every model detail view includes **Show room image / Show model** at the top
 right, with **Back to room** directly below. Rotation, zoom, and reset buttons
@@ -223,15 +355,22 @@ zoom are preserved while comparing. Back/Escape restores the main cartoon room.
 Each hotspot first zooms toward its location in the room, then opens its assigned
 model or animation. Zooms frame the selected area and keep the backdrop covering
 the stage. Reduced motion skips the zoom. Back or Escape can cancel it at any time.
-Marker **07 / Cabinet doors** zooms in and cuts to an 11-frame opening animation
-at **6 fps** (about 1.83 seconds). It plays once and holds the final frame, with
-Pause/Play and Replay controls. All frames load before playback to avoid gaps.
-Reduced motion shows the closed-door frame until Play is selected. Playback
+Marker **07 / Cabinet doors** zooms in and plays `resource/video/cabinet-doors.mp4`.
+It uses seconds **00:11–00:22** of the supplied MOV, at **2x speed** (5.5 seconds).
+The central 70% is kept, cropping 15% from both left and right. Output is
+896 × 720 H.264, 30 fps, without audio, with browser-friendly fast start.
+HLG HDR is tone-mapped to SDR BT.709, then adjusted with contrast 1.08,
+brightness +0.025, saturation 1.10, and gamma 1.04 for more vibrant subjects.
+It plays once, holds the final frame, and retains Pause/Play and Replay.
+On entry, the video grows from 40% to fill the available viewing area over
+1.8 seconds, preserving its aspect ratio, with a gentle fade-in. Reduced motion
+shows it at full size immediately. The cat animation keeps its existing sizing.
+Reduced motion shows `resource/video/cabinet-doors-poster.jpg` until Play. Playback
 pauses when the tab is hidden and stops on return.
 When the door animation finishes, `resource/images/props/card.jpeg` opens in an
 image popup, growing over 700 ms from the center of the door image into its final
 position while the background gently dims. The card decodes before the reveal;
-reduced motion shows it immediately. `resource/text/cabinet_doors/text` appears
+reduced motion shows it immediately. `resource/text/cabinet_doors/text.json` appears
 to the right of the card on desktop and below it on narrow screens. The UTF-8
 file is re-read each opening, preserving paragraphs; empty or failed copy stays
 hidden and the card still opens. Close photos, Escape, or a backdrop click returns to the final door
@@ -251,6 +390,19 @@ The story, final visual direction, and remaining interactions are still open.
 See [`CREATIVE_BRIEF.md`](CREATIVE_BRIEF.md) for confirmed requirements.
 
 ## Current working style
+
+The room/model/animation window is now 75% of the preceding layout's width
+and height: `min(75%, (viewport height - 120px) * 1.5)` with the original 4:3
+proportions. The header aligns with it. Phone layouts remain full width.
+Models and copy use the balanced columns described above, with centered reading
+panels, comfortable line lengths, rounded corners, and clear space between them.
+On tablet/phone widths up to 900 pixels, model copy stacks below the scene.
+
+Verified in Chrome at 1280 x 720, 1920 x 1080, 2560 x 1440, and 3840 x 2160:
+scene width and height are 75% of their previous measurements. All seven model
+views render, all 17 shelf surfaces remain clickable, and coffee rewards and
+cabinet album surface clicks work after the framing change. Tablet/phone layout
+and resizing passed without uncaught browser exceptions.
 
 Use the supplied block-style cartoon room as the main playground, with simple
 point-and-click exploration. The current interface uses warm off-white/cream
@@ -305,10 +457,9 @@ Use relative asset URLs in code rather than machine-specific Windows paths.
 
 `.gitignore` keeps local source/reference images out of Git: original numbered
 photos, original door/cat frames, model reference JPGs, and individual room
-reference photos. The 98 browser image assets remain included: gallery and
-animation `web/` copies, both room backdrops, reward images, and the card.
-The 116 ignored images stay on disk; originals are still needed to rebuild
-optimized copies and are not distributed by a fresh Git checkout.
+reference photos. Current animation `web/` copies, both room backdrops, reward images, and the card
+remain included. Unused source/reference images outside the cleared gallery
+folder stay locally; ignored originals are not distributed by a fresh checkout.
 
 ## Instructions for an AI coding agent
 
@@ -420,12 +571,19 @@ source hashes were unchanged; all seven optimized GLBs remain included by Git.
 ### Project files
 
 - `index.html`, `styles.css`, `app.js`: scene layout, transitions, and interaction.
+- `i18n.js`: three-language JSON loading, interface translation, and language selection.
 - `scene-elements.js`: object labels, bounds, marker positions, and photo mappings.
 - `espresso-glow.js`: model-specific button positions and procedural glow overlays.
 - `shelf-interactions.js`: 17 shelf item regions, surface glow, and object picking.
-- `shelf-gallery.js`, `shelf-albums.js`, `shelf-photos.js`: modal galleries, grouped shelf albums, and generated source photo mapping.
+- `shelf-gallery.js`, `photo-albums.json`, `photo-albums.js`: shared galleries, item-to-folder mapping, and generated browser photo list.
+- `scripts/prepare-photo-albums.py`: prepare folder-based browser albums.
+- `shelf-albums.js`, `shelf-photos.js`: legacy numbered mapping, no longer used at runtime.
 - `scripts/prepare-shelf-photos.py`: optional local HEIC/JPEG conversion and manifest generation.
-- `frame-animation.js`: shared elapsed-time playback: door at 6 fps, cat at 2 fps with hover pause.
+- `frame-animation.js`: cat playback at 2 fps with hover pause.
+- `video-animation.js`: cabinet MP4 playback through the existing canvas and controls.
+- `scripts/prepare-cabinet-video.py`: optional local FFmpeg trim, HDR conversion,
+  color correction, 15%-per-side crop, and 2x-speed video preparation. Run
+  `python scripts/prepare-cabinet-video.py "PATH_TO_MOV" --ffmpeg "PATH_TO_FFMPEG"`.
 - `resource/images/main_scene/whole_scene_cartoon.png`: default 4:3 cartoon backdrop.
 - `resource/images/main_scene/whole_scene.jpg`: original real room image for comparison.
 - `resource/model/espresso.optimized.glb`: current optimized espresso model.
@@ -451,15 +609,15 @@ window resizes. The model is centered and framed automatically from its bounds.
 | 04 | Cabinet top | `resource/model/display_shelf/top/cabinet-top.optimized.glb`; `side_cabinet_top.jpg` remains a reference |
 | 05 | Cabinet left | `resource/model/display_shelf/left/cabinet-left.optimized.glb` |
 | 06 | Cabinet right | `resource/model/display_shelf/right/cabinet-right.optimized.glb` |
-| 07 | Cabinet doors | 11 frames from `resource/images/opening_door/web/`, ordered by original timestamp, at 6 fps |
+| 07 | Cabinet doors | `resource/video/cabinet-doors.mp4`, 896 × 720, 5.5 seconds at 30 fps; then the localized card and RSVP form |
 | 08 | Beneath the cabinet | `resource/images/cat/web/0.jpg` through `12.jpg`, in numeric order, at 2 fps; hover to pause |
 | 09 | Photo shelves | `resource/model/shelf.optimized.glb`; `shelf.jpg` remains a reference photo |
 
 The named list and this mapping use the current order, numbered 01-09.
 The cat animation uses the beneath-cabinet area. Earlier cabinet
-door photos in `main_scene/` remain reference assets; marker 07 uses the new
-`opening_door/` sequence. Playback copies preserve the original framing, use
-900 × 1200 JPEGs at quality 90, and total about 2 MB; original photos are unchanged.
+door photos in `main_scene/` and `opening_door/` remain ignored reference assets;
+marker 07 uses the prepared MP4. The obsolete eleven JPEG playback copies have
+been removed. The original MOV stays in Downloads unchanged.
 Cat playback copies use 1200 × 900 JPEGs at quality 90 and total about 2 MB.
 Original cat photos and the earlier beneath-cabinet still photos are preserved.
 The full-shelf photo hotspot has been removed. `side_cabinet_middle.jpg`
@@ -646,6 +804,4 @@ See [GitHub's publishing-source instructions](https://docs.github.com/en/pages/g
 Record the supplied model's license and any required attribution before publishing;
 see `THIRD_PARTY_NOTICES.md`.
 
-#   w e d d i n g - i n v i t a t i o n 
- 
- 
+# wedding-invitation
